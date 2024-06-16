@@ -1,22 +1,16 @@
 #include <cxxopts.hpp>
 #include <iostream>
 #include <string>
-#include <unordered_map>
 
-#include "cppexchange/cppexchange.h"
+#include "constants.h"
 #include "cppexchange/version.h"
+#include "dotenv.h"
 
 auto main(int argc, char** argv) -> int {
-  const std::unordered_map<std::string, cppexchange::LanguageCode> languages{
-      {"en", cppexchange::LanguageCode::EN},
-      {"de", cppexchange::LanguageCode::DE},
-      {"es", cppexchange::LanguageCode::ES},
-      {"fr", cppexchange::LanguageCode::FR},
-  };
+  dotenv::init((PROJECT_ROOT / ".env").string().c_str());
 
   cxxopts::Options options(*argv, "A program to welcome the world!");
 
-  std::string language;
   std::string name;
 
   // clang-format off
@@ -24,7 +18,6 @@ auto main(int argc, char** argv) -> int {
     ("h,help", "Show help")
     ("v,version", "Print the current version number")
     ("n,name", "Name to greet", cxxopts::value(name)->default_value("World"))
-    ("l,lang", "Language code to use", cxxopts::value(language)->default_value("en"))
   ;
   // clang-format on
 
@@ -40,14 +33,7 @@ auto main(int argc, char** argv) -> int {
     return 0;
   }
 
-  auto langIt = languages.find(language);
-  if (langIt == languages.end()) {
-    std::cerr << "unknown language code: " << language << std::endl;
-    return 1;
-  }
-
-  cppexchange::CPPExchange cppexchange(name);
-  std::cout << cppexchange.greet(langIt->second) << std::endl;
+  std::cout << std::getenv("POSTGRES_SERVER") << std::endl;
 
   return 0;
 }

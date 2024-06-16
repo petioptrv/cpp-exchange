@@ -82,4 +82,6 @@ option(BUILD_STANDALONE "Build the standalone executable" OFF)
 
 if(BUILD_STANDALONE)
   add_subdirectory(standalone)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.env
+    ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 endif()

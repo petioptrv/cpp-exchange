@@ -7,6 +7,6 @@
 
 #include <filesystem>
 
- std::filesystem::path PROJECT_ROOT = std::filesystem::current_path() / "..";
+std::filesystem::path PROJECT_ROOT = std::filesystem::current_path() / "..";
 
 #endif  // CONSTANTS_H
