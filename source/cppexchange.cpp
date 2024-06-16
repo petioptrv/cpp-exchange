@@ -1,8 +1,8 @@
 #include <fmt/format.h>
 
-#include "cpp_exchange/cpp_exchange.h"
+#include "cppexchange/cppexchange.h"
 
-using namespace cpp_exchange;
+using namespace cppexchange;
 
 CPPExchange::CPPExchange(std::string _name) : name(std::move(_name)) {}
 

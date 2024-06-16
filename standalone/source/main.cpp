@@ -1,18 +1,17 @@
-#include <cpp_exchange/version.h>
-
 #include <cxxopts.hpp>
 #include <iostream>
 #include <string>
 #include <unordered_map>
 
-#include "cpp_exchange/cpp_exchange.h"
+#include "cppexchange/cppexchange.h"
+#include "cppexchange/version.h"
 
 auto main(int argc, char** argv) -> int {
-  const std::unordered_map<std::string, cpp_exchange::LanguageCode> languages{
-      {"en", cpp_exchange::LanguageCode::EN},
-      {"de", cpp_exchange::LanguageCode::DE},
-      {"es", cpp_exchange::LanguageCode::ES},
-      {"fr", cpp_exchange::LanguageCode::FR},
+  const std::unordered_map<std::string, cppexchange::LanguageCode> languages{
+      {"en", cppexchange::LanguageCode::EN},
+      {"de", cppexchange::LanguageCode::DE},
+      {"es", cppexchange::LanguageCode::ES},
+      {"fr", cppexchange::LanguageCode::FR},
   };
 
   cxxopts::Options options(*argv, "A program to welcome the world!");
@@ -47,8 +46,8 @@ auto main(int argc, char** argv) -> int {
     return 1;
   }
 
-  cpp_exchange::CPPExchange cpp_exchange(name);
-  std::cout << cpp_exchange.greet(langIt->second) << std::endl;
+  cppexchange::CPPExchange cppexchange(name);
+  std::cout << cppexchange.greet(langIt->second) << std::endl;
 
   return 0;
 }

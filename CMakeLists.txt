@@ -76,3 +76,10 @@ packageProject(
   COMPATIBILITY SameMajorVersion
   DEPENDENCIES "fmt 9.1.0"
 )
+
+# ---- Option to build standalone ----
+option(BUILD_STANDALONE "Build the standalone executable" OFF)
+
+if(BUILD_STANDALONE)
+  add_subdirectory(standalone)
+endif()

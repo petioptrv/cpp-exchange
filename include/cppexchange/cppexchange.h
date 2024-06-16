@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace cpp_exchange {
+namespace cppexchange {
 
   /**  Language codes to be used with the CPPExchange class */
   enum class LanguageCode { EN, DE, ES, FR };
@@ -28,4 +28,4 @@ namespace cpp_exchange {
     std::string greet(LanguageCode lang = LanguageCode::EN) const;
   };
 
-}  // namespace cpp_exchange
+}  // namespace cppexchange

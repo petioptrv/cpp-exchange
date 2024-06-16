@@ -1,19 +1,19 @@
+#include <cppexchange/version.h>
 #include <doctest/doctest.h>
-#include <cpp_exchange/version.h>
 
 #include <string>
 
-#include "cpp_exchange/cpp_exchange.h"
+#include "cppexchange/cppexchange.h"
 
 TEST_CASE("CPPExchange") {
-  using namespace cpp_exchange;
+  using namespace cppexchange;
 
-  CPPExchange cpp_exchange("Tests");
+  CPPExchange cppexchange("Tests");
 
-  CHECK(cpp_exchange.greet(LanguageCode::EN) == "Hello, Tests!");
-  CHECK(cpp_exchange.greet(LanguageCode::DE) == "Hallo Tests!");
-  CHECK(cpp_exchange.greet(LanguageCode::ES) == "¡Hola Tests!");
-  CHECK(cpp_exchange.greet(LanguageCode::FR) == "Bonjour Tests!");
+  CHECK(cppexchange.greet(LanguageCode::EN) == "Hello, Tests!");
+  CHECK(cppexchange.greet(LanguageCode::DE) == "Hallo Tests!");
+  CHECK(cppexchange.greet(LanguageCode::ES) == "¡Hola Tests!");
+  CHECK(cppexchange.greet(LanguageCode::FR) == "Bonjour Tests!");
 }
 
 TEST_CASE("CPPExchange version") {
