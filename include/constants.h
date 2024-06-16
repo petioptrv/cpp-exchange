@@ -7,6 +7,8 @@
 
 #include <filesystem>
 
-std::filesystem::path PROJECT_ROOT = std::filesystem::current_path() / "..";
+namespace constants {
+    static const std::filesystem::path PROJECT_ROOT = std::filesystem::current_path() / "..";
+}  // namespace constants
 
 #endif  // CONSTANTS_H

@@ -85,3 +85,10 @@ if(BUILD_STANDALONE)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.env
     ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 endif()
+
+# ---- Option to build test ----
+option(BUILD_TEST "Build the tests" OFF)
+
+if(BUILD_TEST)
+  add_subdirectory(test)
+endif()
