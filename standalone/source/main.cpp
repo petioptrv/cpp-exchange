@@ -31,7 +31,7 @@ auto main(int argc, char** argv) -> int {
         return 0;
     }
 
-    std::cout << conf.getPostgresDb() << std::endl;
+    std::cout << conf.get_postgres_db() << std::endl;
 
     return 0;
 }

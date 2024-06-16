@@ -14,11 +14,11 @@
 namespace config {
     class Config : public helpers::Singleton<Config> {
       public:
-        [[nodiscard]] const std::string& getPostgresServer() const { return POSTGRES_SERVER; }
-        [[nodiscard]] const int& getPostgresPort() const { return POSTGRES_PORT; }
-        [[nodiscard]] const std::string& getPostgresDb() const { return POSTGRES_DB; }
-        [[nodiscard]] const std::string& getPostgresUser() const { return POSTGRES_USER; }
-        [[nodiscard]] const std::string& getPostgresPassword() const { return POSTGRES_PASSWORD; }
+        [[nodiscard]] const std::string& get_postgres_server() const { return POSTGRES_SERVER; }
+        [[nodiscard]] const int& get_postgres_port() const { return POSTGRES_PORT; }
+        [[nodiscard]] const std::string& get_postgres_db() const { return POSTGRES_DB; }
+        [[nodiscard]] const std::string& get_postgres_user() const { return POSTGRES_USER; }
+        [[nodiscard]] const std::string& get_postgres_password() const { return POSTGRES_PASSWORD; }
 
       protected:
         Config() {
