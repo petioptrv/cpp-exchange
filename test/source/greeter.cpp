@@ -1,21 +1,22 @@
 #include <doctest/doctest.h>
-#include <greeter/greeter.h>
-#include <greeter/version.h>
+#include <cpp_exchange/version.h>
 
 #include <string>
 
-TEST_CASE("Greeter") {
-  using namespace greeter;
+#include "cpp_exchange/cpp_exchange.h"
 
-  Greeter greeter("Tests");
+TEST_CASE("CPPExchange") {
+  using namespace cpp_exchange;
 
-  CHECK(greeter.greet(LanguageCode::EN) == "Hello, Tests!");
-  CHECK(greeter.greet(LanguageCode::DE) == "Hallo Tests!");
-  CHECK(greeter.greet(LanguageCode::ES) == "¡Hola Tests!");
-  CHECK(greeter.greet(LanguageCode::FR) == "Bonjour Tests!");
+  CPPExchange cpp_exchange("Tests");
+
+  CHECK(cpp_exchange.greet(LanguageCode::EN) == "Hello, Tests!");
+  CHECK(cpp_exchange.greet(LanguageCode::DE) == "Hallo Tests!");
+  CHECK(cpp_exchange.greet(LanguageCode::ES) == "¡Hola Tests!");
+  CHECK(cpp_exchange.greet(LanguageCode::FR) == "Bonjour Tests!");
 }
 
-TEST_CASE("Greeter version") {
-  static_assert(std::string_view(GREETER_VERSION) == std::string_view("1.0"));
-  CHECK(std::string(GREETER_VERSION) == std::string("1.0"));
+TEST_CASE("CPPExchange version") {
+  static_assert(std::string_view(CPPEXCHANGE_VERSION) == std::string_view("1.0"));
+  CHECK(std::string(CPPEXCHANGE_VERSION) == std::string("1.0"));
 }

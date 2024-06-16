@@ -1,17 +1,18 @@
-#include <greeter/greeter.h>
-#include <greeter/version.h>
+#include <cpp_exchange/version.h>
 
 #include <cxxopts.hpp>
 #include <iostream>
 #include <string>
 #include <unordered_map>
 
+#include "cpp_exchange/cpp_exchange.h"
+
 auto main(int argc, char** argv) -> int {
-  const std::unordered_map<std::string, greeter::LanguageCode> languages{
-      {"en", greeter::LanguageCode::EN},
-      {"de", greeter::LanguageCode::DE},
-      {"es", greeter::LanguageCode::ES},
-      {"fr", greeter::LanguageCode::FR},
+  const std::unordered_map<std::string, cpp_exchange::LanguageCode> languages{
+      {"en", cpp_exchange::LanguageCode::EN},
+      {"de", cpp_exchange::LanguageCode::DE},
+      {"es", cpp_exchange::LanguageCode::ES},
+      {"fr", cpp_exchange::LanguageCode::FR},
   };
 
   cxxopts::Options options(*argv, "A program to welcome the world!");
@@ -36,7 +37,7 @@ auto main(int argc, char** argv) -> int {
   }
 
   if (result["version"].as<bool>()) {
-    std::cout << "Greeter, version " << GREETER_VERSION << std::endl;
+    std::cout << "CPPExchange, version " << CPPEXCHANGE_VERSION << std::endl;
     return 0;
   }
 
@@ -46,8 +47,8 @@ auto main(int argc, char** argv) -> int {
     return 1;
   }
 
-  greeter::Greeter greeter(name);
-  std::cout << greeter.greet(langIt->second) << std::endl;
+  cpp_exchange::CPPExchange cpp_exchange(name);
+  std::cout << cpp_exchange.greet(langIt->second) << std::endl;
 
   return 0;
 }

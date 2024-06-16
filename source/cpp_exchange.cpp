@@ -1,11 +1,12 @@
 #include <fmt/format.h>
-#include <greeter/greeter.h>
 
-using namespace greeter;
+#include "cpp_exchange/cpp_exchange.h"
 
-Greeter::Greeter(std::string _name) : name(std::move(_name)) {}
+using namespace cpp_exchange;
 
-std::string Greeter::greet(LanguageCode lang) const {
+CPPExchange::CPPExchange(std::string _name) : name(std::move(_name)) {}
+
+std::string CPPExchange::greet(LanguageCode lang) const {
   switch (lang) {
     default:
     case LanguageCode::EN:
