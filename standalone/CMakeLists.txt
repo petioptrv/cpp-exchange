@@ -16,6 +16,18 @@ CPMAddPackage(
   OPTIONS "CXXOPTS_BUILD_EXAMPLES NO" "CXXOPTS_BUILD_TESTS NO" "CXXOPTS_ENABLE_INSTALL YES"
 )
 
+CPMAddPackage(
+  GITHUB_REPOSITORY jtv/libpqxx
+  GIT_TAG "7.9.1"
+)
+
+CPMAddPackage(
+  NAME fmt
+  GIT_TAG 10.2.1
+  GITHUB_REPOSITORY fmtlib/fmt
+  OPTIONS "FMT_INSTALL YES" # create an installable target
+)
+
 # ---- Create standalone executable ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
@@ -24,4 +36,4 @@ add_executable(${PROJECT_NAME} ${sources})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "CPPExchange")
 
-target_link_libraries(${PROJECT_NAME} CPPExchange::CPPExchange cxxopts  -lpqxx -lpq)
+target_link_libraries(${PROJECT_NAME} CPPExchange::CPPExchange cxxopts pqxx fmt::fmt)

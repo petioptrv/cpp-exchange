@@ -2,11 +2,10 @@
 #include <iostream>
 #include <string>
 
-#include "config.h"
+#include "cppexchange/db/postgresql.h"
 #include "cppexchange/version.h"
 
 auto main(int argc, char** argv) -> int {
-    auto& conf = config::Config::get_instance();
 
     cxxopts::Options options(*argv, "A program to welcome the world!");
 
@@ -31,7 +30,19 @@ auto main(int argc, char** argv) -> int {
         return 0;
     }
 
-    std::cout << conf.get_postgres_db() << std::endl;
+    try {
+        PostgreSQL* db = PostgreSQLBuilder().get_connection_instance();
+        if (db->is_connected()) {
+            std::cout << "Opened database successfully" << std::endl;
+        } else {
+            std::cout << "Can't open database" << std::endl;
+            return 1;
+        }
+        delete db;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }

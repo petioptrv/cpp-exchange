@@ -1,0 +1,1 @@
+-DPostgreSQL_LIBRARY=/usr/local/opt/postgresql@14/lib -DPostgreSQL_INCLUDE_DIR=/usr/local/opt/postgresql@14/include -DCMAKE_CXX_FLAGS="-I/usr/local/opt/libpq/include" -DCMAKE_EXE_LINKER_FLAGS="-L/usr/local/opt/libpq/lib -lpq"
