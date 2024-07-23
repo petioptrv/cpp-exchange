@@ -17,11 +17,6 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-  GITHUB_REPOSITORY jtv/libpqxx
-  GIT_TAG "7.9.1"
-)
-
-CPMAddPackage(
   NAME fmt
   GIT_TAG 10.2.1
   GITHUB_REPOSITORY fmtlib/fmt
@@ -36,4 +31,4 @@ add_executable(${PROJECT_NAME} ${sources})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "CPPExchange")
 
-target_link_libraries(${PROJECT_NAME} CPPExchange::CPPExchange cxxopts pqxx fmt::fmt)
+target_link_libraries(${PROJECT_NAME} CPPExchange::CPPExchange cxxopts fmt::fmt)

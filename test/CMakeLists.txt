@@ -20,7 +20,12 @@ CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 
 # ---- Create binary ----
 
-file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+file(GLOB sources CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/communication/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/cppexchange/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/utils/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp
+)
 add_executable(${PROJECT_NAME} ${sources})
 target_link_libraries(${PROJECT_NAME} doctest::doctest CPPExchange::CPPExchange)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)

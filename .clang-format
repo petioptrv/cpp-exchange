@@ -13,4 +13,6 @@
   NamespaceIndentation: All
   BreakBeforeBinaryOperators: All
   BreakBeforeTernaryOperators: 'true'
+  AlignAfterOpenBracket: BlockIndent
+  BinPackParameters: false
 ...
