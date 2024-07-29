@@ -1,27 +1,25 @@
-//
-// Created by Petio Petrov on 2024-07-17.
-//
-
-#pragma once
-
+#include <cstdio>
 #include <cstdint>
+#include <cstddef>
 
-#include "cppexchange/typedefs.h"
+typedef uint32_t OrderIdT;
+typedef uint32_t ClientIdT;
+typedef uint64_t MsTimestampT;
+typedef float QuantityT;
+typedef float PriceT;
 
 namespace Orders {
 
-    enum OrderSide { BUY, SELL , INVALID};
+    enum OrderSide { BUY, SELL };
 
     struct Order {
-        OrderIdT order_id = OrderId_INVALID;
-        ClientIdT client_id = ClientId_INVALID;
-        MsTimestampT ms_timestamp = MsTimestamp_INVALID;
-        QuantityT quantity = Quantity_INVALID;
-        PriceT limit_price = Price_INVALID;
+        OrderIdT order_id;
+        ClientIdT client_id;
+        MsTimestampT ms_timestamp;
+        QuantityT quantity;
+        PriceT limit_price;
         QuantityT executed{0};
-        OrderSide side = INVALID;
-
-        Order() = default;
+        OrderSide side;
 
         Order(
             OrderIdT order_id,
@@ -59,4 +57,15 @@ namespace Orders {
         }
     };
 
-}  // namespace Orders
+}
+
+int main() {
+    printf("Order offsetof oid:%lu cid:%lu mst:%lu q:%lu lp:%lu e:%lu s:%lu size:%lu",
+           offsetof(struct Orders::Order, order_id), offsetof(struct Orders::Order, client_id),
+           offsetof(struct Orders::Order, ms_timestamp), offsetof(struct Orders::Order, quantity),
+           offsetof(struct Orders::Order, limit_price), offsetof(struct Orders::Order, executed),
+           offsetof(struct Orders::Order, side), sizeof(Orders::Order));
+    printf("\nOrder alignof oid:%zu cid:%zu mst:%zu q:%zu lp:%zu e:%zu s:%zu",
+           alignof(OrderIdT), alignof(ClientIdT), alignof(MsTimestampT), alignof( QuantityT),
+           alignof(PriceT), alignof( QuantityT), alignof(Orders::OrderSide));
+}

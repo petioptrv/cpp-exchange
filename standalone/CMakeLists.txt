@@ -26,6 +26,7 @@ CPMAddPackage(
 # ---- Create standalone executable ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/investigation/*.cpp)
 
 add_executable(${PROJECT_NAME} ${sources})
 

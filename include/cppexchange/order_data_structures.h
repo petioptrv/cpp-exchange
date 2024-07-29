@@ -48,42 +48,4 @@ namespace OrderDataStructures {
 
     typedef OrderQueue<Orders::BuyOrderCompare> BuyOrderQueue;
     typedef OrderQueue<Orders::SellOrderCompare> SellOrderQueue;
-
-    class OrderObjectPool : public Utils::Singleton<OrderObjectPool> {
-      public:
-        Orders::Order* getOrder(
-            ClientIdT client_id,
-            MsTimestampT ms_timestamp,
-            Orders::OrderSide side,
-            QuantityT quantity,
-            PriceT limit_price
-        ) {
-            Orders::Order* order;
-
-            if (pool.empty()) {
-                order = new Orders::Order(
-                    nextOrderId, client_id, ms_timestamp, side, quantity, limit_price
-                );
-            } else {
-                order = pool.back();
-                pool.pop_back();
-                order->order_id = nextOrderId;
-                order->client_id = client_id;
-                order->ms_timestamp = ms_timestamp;
-                order->side = side;
-                order->quantity = quantity;
-                order->limit_price = limit_price;
-            }
-
-            ++nextOrderId;
-
-            return order;
-        }
-
-        void releaseOrder(Orders::Order* order) { pool.push_front(order); }
-
-      private:
-        std::deque<Orders::Order*> pool;
-        uint32_t nextOrderId = 0;
-    };
 }  // namespace OrderDataStructures

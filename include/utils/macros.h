@@ -1,0 +1,18 @@
+//
+// Created by Petio Petrov on 2024-07-29.
+//
+
+#pragma once
+
+#include <iostream>
+
+#define LIKELY(x) __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+
+inline auto ASSERT(bool cond, const std::string &msg) noexcept {
+  if (UNLIKELY(!cond)) {
+    std::cerr << "ASSERT : " << msg << std::endl;
+
+    exit(EXIT_FAILURE);
+  }
+}

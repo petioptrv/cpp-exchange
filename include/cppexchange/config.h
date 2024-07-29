@@ -22,7 +22,7 @@ namespace config {
 
       protected:
         Config() {
-            dotenv::init((constants::PROJECT_ROOT / ".env").string().c_str());
+            dotenv::init((Constants::PROJECT_ROOT / ".env").string().c_str());
 
             POSTGRES_SERVER = helpers::getenv_with_default("POSTGRES_SERVER", "localhost");
             POSTGRES_PORT = stoi(helpers::getenv_with_default("POSTGRES_PORT", "5432"));

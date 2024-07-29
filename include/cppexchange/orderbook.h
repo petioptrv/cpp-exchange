@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include "cppexchange/config.h"
 #include "cppexchange/order.h"
 #include "cppexchange/order_data_structures.h"
+#include "utils/object_pool.h"
 
 class OrderBook final {
   public:
+    OrderBook() : order_pool(Constants::ME_MAX_ORDER_IDS) {}
     std::vector<Orders::Order*> top(Orders::OrderSide side, int n_levels) {
         OrderDataStructures::OrdersIterator it_begin;
         OrderDataStructures::OrdersIterator it_end;
@@ -38,9 +41,9 @@ class OrderBook final {
         PriceT limit_price
     ) {
         if (side == Orders::BUY) {
-            asks.push(order_pool.getOrder(client_id, ms_timestamp, side, quantity, limit_price));
+            asks.push(order_pool.getObject(0, client_id, ms_timestamp, side, quantity, limit_price));
         } else {
-            bids.push(order_pool.getOrder(client_id, ms_timestamp, side, quantity, limit_price));
+            bids.push(order_pool.getObject(1, client_id, ms_timestamp, side, quantity, limit_price));
         }
 
         return true;
@@ -77,6 +80,5 @@ class OrderBook final {
     OrderDataStructures::BuyOrderQueue bids;
     OrderDataStructures::SellOrderQueue asks;
 
-    OrderDataStructures::OrderObjectPool& order_pool
-        = OrderDataStructures::OrderObjectPool::getInstance();
+    Utils::ObjectPool<Orders::Order> order_pool;
 };

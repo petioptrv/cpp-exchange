@@ -5,9 +5,7 @@
 #include "cppexchange/order_data_structures.h"
 
 #include <doctest/doctest.h>
-#include <cstdint>
 
-#include "cppexchange/typedefs.h"
 #include "cppexchange/order.h"
 
 using namespace Orders;
@@ -66,23 +64,4 @@ TEST_CASE("Orders iteration") {
     ++oit;
     ++oit;
     CHECK(oit == s.end());
-}
-
-TEST_CASE("Order object pool") {
-    OrderObjectPool& p = OrderObjectPool::getInstance();
-    ClientIdT client_id = 0;
-
-    Order* order_0 = p.getOrder(client_id, 2, SELL, 1, 9);
-    Order* order_1 = p.getOrder(client_id, 2, SELL, 2, 9);
-
-    CHECK(order_0 != order_1);
-
-    p.releaseOrder(order_0);
-
-    Order* order_2 = p.getOrder(client_id, 3, BUY, 2, 8);
-
-    CHECK(order_0 == order_2);
-    CHECK(order_2->side == BUY);
-    CHECK(order_2->quantity == 2);
-    CHECK(order_2->limit_price == 8);
 }
