@@ -3,15 +3,15 @@
 //
 
 #include "cppexchange/order.h"
-#include "cppexchange/order_data_structures.h"
+#include "cppexchange/helpers.h"
 
 #include <doctest/doctest.h>
 
 using namespace Orders;
-using namespace OrderDataStructures;
+using namespace Helpers;
 
 TEST_CASE("Order properties") {
-    Order order(0, 1, 2, BUY, 4, 5);
+    Order order(0, 1, getCurrentMsTimestamp(), BUY, 4, 5);
 
     CHECK(order.order_id == 0);
     CHECK(order.client_id == 1);

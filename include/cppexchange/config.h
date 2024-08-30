@@ -12,7 +12,7 @@
 #include "helpers.h"
 
 namespace config {
-    class Config : public helpers::Singleton<Config> {
+    class Config : public Helpers::Singleton<Config> {
       public:
         [[nodiscard]] const std::string& get_postgres_server() const { return POSTGRES_SERVER; }
         [[nodiscard]] const int& get_postgres_port() const { return POSTGRES_PORT; }
@@ -24,11 +24,11 @@ namespace config {
         Config() {
             dotenv::init((Constants::PROJECT_ROOT / ".env").string().c_str());
 
-            POSTGRES_SERVER = helpers::getenv_with_default("POSTGRES_SERVER", "localhost");
-            POSTGRES_PORT = stoi(helpers::getenv_with_default("POSTGRES_PORT", "5432"));
-            POSTGRES_DB = helpers::getenv_with_default("POSTGRES_DB", "app");
-            POSTGRES_USER = helpers::getenv_with_default("POSTGRES_USER", "postgres");
-            POSTGRES_PASSWORD = helpers::getenv_with_default("POSTGRES_PASSWORD", "admin");
+            POSTGRES_SERVER = Helpers::getEnvWithDefault("POSTGRES_SERVER", "localhost");
+            POSTGRES_PORT = stoi(Helpers::getEnvWithDefault("POSTGRES_PORT", "5432"));
+            POSTGRES_DB = Helpers::getEnvWithDefault("POSTGRES_DB", "app");
+            POSTGRES_USER = Helpers::getEnvWithDefault("POSTGRES_USER", "postgres");
+            POSTGRES_PASSWORD = Helpers::getEnvWithDefault("POSTGRES_PASSWORD", "admin");
         }
 
       private:
