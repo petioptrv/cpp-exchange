@@ -8,6 +8,9 @@
 
 
 namespace Communication {
+    /**
+     * Lock-free queue
+     */
     template <typename T> class LFQueue final {
       public:
         explicit LFQueue(std::size_t n) : data_(n, T()) {}
