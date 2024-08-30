@@ -1,71 +1,74 @@
-#include <cstdio>
-#include <cstdint>
 #include <cstddef>
+#include <cstdio>
 
-typedef uint32_t OrderIdT;
-typedef uint32_t ClientIdT;
-typedef uint64_t MsTimestampT;
-typedef float QuantityT;
-typedef float PriceT;
+#include "cppexchange/order.h"
 
-namespace Orders {
+void checkOrderMemoryAlignment() {
+    printf(
+        "\nOrder alignof  p:%zu n:%zu oid:%zu cid:%zu q:%zu e:%zu mst:%zu lp:%zu s:%zu",
+        alignof(Orders::Order*),
+        alignof(Orders::Order*),
+        alignof(OrderIdT),
+        alignof(ClientIdT),
+        alignof(QuantityT),
+        alignof(QuantityT),
+        alignof(MsTimestampT),
+        alignof(PriceT),
+        alignof(Orders::OrderSide)
+    );
+    printf(
+        "\nOrder sizeof   p:%lu n:%lu oid:%lu cid:%lu q:%lu e:%lu mst:%lu lp:%lu s:%lu size:%lu",
+        sizeof(Orders::Order*),
+        sizeof(Orders::Order*),
+        sizeof(OrderIdT),
+        sizeof(ClientIdT),
+        sizeof(QuantityT),
+        sizeof(QuantityT),
+        sizeof(MsTimestampT),
+        sizeof(PriceT),
+        sizeof(Orders::OrderSide),
+        sizeof(Orders::Order)
+    );
+    printf(
+        "\nOrder offsetof p:%zu n:%zu oid:%zu cid:%zu q:%zu e:%zu mst:%zu lp:%zu s:%zu",
+        offsetof(struct Orders::Order, previous),
+        offsetof(struct Orders::Order, next),
+        offsetof(struct Orders::Order, order_id),
+        offsetof(struct Orders::Order, client_id),
+        offsetof(struct Orders::Order, quantity),
+        offsetof(struct Orders::Order, executed),
+        offsetof(struct Orders::Order, ms_timestamp),
+        offsetof(struct Orders::Order, limit_price),
+        offsetof(struct Orders::Order, side)
+    );
+}
 
-    enum OrderSide { BUY, SELL };
-
-    struct Order {
-        OrderIdT order_id;
-        ClientIdT client_id;
-        MsTimestampT ms_timestamp;
-        QuantityT quantity;
-        PriceT limit_price;
-        QuantityT executed{0};
-        OrderSide side;
-
-        Order(
-            OrderIdT order_id,
-            ClientIdT client_id,
-            MsTimestampT ms_timestamp,
-            OrderSide side,
-            QuantityT quantity,
-            PriceT limit_price
-        )
-            : order_id(order_id),
-              client_id(client_id),
-              ms_timestamp(ms_timestamp),
-              quantity(quantity),
-              limit_price(limit_price),
-              side(side) {}
-    };
-
-    struct BuyOrderCompare {
-        bool operator()(const Order* first, const Order* second) const {
-            return (
-                first->limit_price == second->limit_price
-                    ? first->ms_timestamp > second->ms_timestamp
-                    : first->limit_price < second->limit_price
-            );
-        }
-    };
-
-    struct SellOrderCompare {
-        bool operator()(const Order* first, const Order* second) const {
-            return (
-                first->limit_price == second->limit_price
-                    ? first->ms_timestamp > second->ms_timestamp
-                    : first->limit_price > second->limit_price
-            );
-        }
-    };
-
+void checkOrdersPriceLevelMemoryAlignment() {
+    printf(
+        "\nOrdersPriceLevel alignof  npl:%zu pl:%zu s:%zu to:%zu",
+        alignof(Orders::OrdersPriceLevel*),
+        alignof(PriceT),
+        alignof(Orders::Order*),
+        alignof(Orders::OrderSide)
+    );
+    printf(
+        "\nOrdersPriceLevel sizeof   npl:%lu pl:%lu s:%lu to:%lu size:%lu",
+        sizeof(Orders::OrdersPriceLevel*),
+        sizeof(PriceT),
+        sizeof(Orders::Order*),
+        sizeof(Orders::OrderSide),
+        sizeof(Orders::OrdersPriceLevel)
+    );
+    printf(
+        "\nOrdersPriceLevel offsetof npl:%zu pl:%zu s:%zu to:%zu",
+        offsetof(Orders::OrdersPriceLevel, next_price_level),
+        offsetof(Orders::OrdersPriceLevel, price_level),
+        offsetof(Orders::OrdersPriceLevel, top_order),
+        offsetof(Orders::OrdersPriceLevel, side)
+    );
 }
 
 int main() {
-    printf("Order offsetof oid:%lu cid:%lu mst:%lu q:%lu lp:%lu e:%lu s:%lu size:%lu",
-           offsetof(struct Orders::Order, order_id), offsetof(struct Orders::Order, client_id),
-           offsetof(struct Orders::Order, ms_timestamp), offsetof(struct Orders::Order, quantity),
-           offsetof(struct Orders::Order, limit_price), offsetof(struct Orders::Order, executed),
-           offsetof(struct Orders::Order, side), sizeof(Orders::Order));
-    printf("\nOrder alignof oid:%zu cid:%zu mst:%zu q:%zu lp:%zu e:%zu s:%zu",
-           alignof(OrderIdT), alignof(ClientIdT), alignof(MsTimestampT), alignof( QuantityT),
-           alignof(PriceT), alignof( QuantityT), alignof(Orders::OrderSide));
+//    checkOrderMemoryAlignment();
+    checkOrdersPriceLevelMemoryAlignment();
 }

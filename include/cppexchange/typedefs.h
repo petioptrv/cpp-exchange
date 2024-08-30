@@ -6,12 +6,13 @@
 
 #include <cstdint>
 #include <limits>
+#include <chrono>
 
 typedef uint32_t OrderIdT;
 typedef uint32_t ClientIdT;
-typedef uint64_t MsTimestampT;
-typedef float QuantityT;
-typedef float PriceT;
+typedef std::chrono::milliseconds MsTimestampT;
+typedef uint32_t QuantityT;
+typedef uint64_t PriceT;
 
 constexpr auto OrderId_INVALID = std::numeric_limits<OrderIdT>::max();
 constexpr auto ClientId_INVALID = std::numeric_limits<ClientIdT>::max();
