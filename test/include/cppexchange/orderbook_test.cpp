@@ -9,6 +9,7 @@
 #include "cppexchange/typedefs.h"
 
 using namespace Orders;
+using namespace CPPExchange;
 
 TEST_CASE("Empty order book") {
     OrderBook order_book;
