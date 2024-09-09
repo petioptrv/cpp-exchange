@@ -11,7 +11,8 @@ using namespace Orders;
 using namespace Helpers;
 
 TEST_CASE("Order properties") {
-    Order order(0, 1, getCurrentMsTimestamp(), BUY, 4, 5);
+    TickerIdT ticker_id = 0;
+    Order order(ticker_id, 0, 1, getCurrentMsTimestamp(), BUY, 4, 5);
 
     CHECK(order.order_id == 0);
     CHECK(order.client_id == 1);
@@ -24,6 +25,7 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
     OrdersPriceLevel price_level;
 
     int order_count = 0;
+    TickerIdT ticker_id = 0;
     OrderIdT first_order_id = 0;
     MsTimestampT initial_ms_timestamp = getCurrentMsTimestamp();
     ClientIdT client_id = 2;
@@ -35,6 +37,7 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
     CHECK(price_level.top() == nullptr);
 
     Order order0(
+        ticker_id,
         first_order_id + order_count,
         client_id,
         initial_ms_timestamp + std::chrono::milliseconds(order_count * 1000),
@@ -48,6 +51,7 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
 
     ++order_count;
     Order order1(
+        ticker_id,
         first_order_id + order_count,
         client_id,
         initial_ms_timestamp + std::chrono::milliseconds(order_count * 1000),

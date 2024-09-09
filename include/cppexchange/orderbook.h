@@ -12,10 +12,12 @@
 
 namespace CPPExchange {
     class OrderBook final {
-        // The OrderBook is an efficient ledger for orders. It does not implement order-matching logic.
+        // The OrderBook is an efficient ledger for orders. It does not implement order-matching
+        // logic.
       public:
-        OrderBook()
-            : order_pool(Constants::MAX_ORDER_IDS),
+        explicit OrderBook(TickerIdT ticker_id)
+            : ticker_id(ticker_id),
+              order_pool(Constants::MAX_ORDER_IDS),
               price_level_pool(Constants::MAX_PRICE_LEVELS),
               price_levels(Constants::MAX_PRICE_LEVELS, nullptr) {}
 
@@ -33,6 +35,7 @@ namespace CPPExchange {
             auto price_level = getPriceLevel(limit_price, side);
 
             auto order = order_pool.getObject(
+                ticker_id,
                 getNextOrderId(),
                 client_id,
                 Helpers::getCurrentMsTimestamp(),
@@ -67,6 +70,7 @@ namespace CPPExchange {
         }
 
       private:
+        TickerIdT ticker_id;
         OrderIdT next_order_id = 1;
         Utils::ObjectPool<Orders::Order> order_pool;
         Utils::ObjectPool<Orders::OrdersPriceLevel> price_level_pool;

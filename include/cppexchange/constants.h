@@ -10,6 +10,7 @@ namespace Constants {
     static const std::filesystem::path PROJECT_ROOT = std::filesystem::current_path() / "..";
 
     constexpr size_t MAX_NUM_CLIENTS = 256;
+    constexpr size_t MAX_TICKERS = 16;
     constexpr size_t MAX_ORDER_IDS = 1024 * 1024;
     constexpr size_t MAX_PRICE_LEVELS
         = 256;  // todo: check this... it can be hackable since we use it to index the

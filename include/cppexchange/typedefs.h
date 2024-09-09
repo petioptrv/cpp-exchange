@@ -8,12 +8,14 @@
 #include <limits>
 #include <chrono>
 
+typedef uint32_t TickerIdT;
 typedef uint32_t OrderIdT;
 typedef uint32_t ClientIdT;
 typedef std::chrono::milliseconds MsTimestampT;
 typedef uint32_t QuantityT;
 typedef uint64_t PriceT;
 
+constexpr auto TickerId_INVALID = std::numeric_limits<OrderIdT>::max();
 constexpr auto OrderId_INVALID = std::numeric_limits<OrderIdT>::max();
 constexpr auto ClientId_INVALID = std::numeric_limits<ClientIdT>::max();
 constexpr auto MsTimestamp_INVALID = std::numeric_limits<MsTimestampT>::max();

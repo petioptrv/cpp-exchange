@@ -17,6 +17,7 @@ namespace Orders {
         Order* previous = nullptr;
         Order* next = nullptr;
 
+        TickerIdT ticker_id = TickerId_INVALID;
         OrderIdT order_id = OrderId_INVALID;
         ClientIdT client_id = ClientId_INVALID;
         QuantityT quantity = Quantity_INVALID;
@@ -28,6 +29,7 @@ namespace Orders {
         Order() = default;
 
         Order(
+            TickerIdT ticker_id,
             OrderIdT order_id,
             ClientIdT client_id,
             MsTimestampT ms_timestamp,
@@ -35,7 +37,8 @@ namespace Orders {
             QuantityT quantity,
             PriceT limit_price
         )
-            : order_id(order_id),
+            : ticker_id(ticker_id),
+              order_id(order_id),
               client_id(client_id),
               quantity(quantity),
               ms_timestamp(ms_timestamp),
@@ -65,7 +68,7 @@ namespace Orders {
 
         OrdersPriceLevel* getNextPriceLevel() { return next_price_level; }
 
-        [[maybe_unused]] OrderSide getSide() const { return side; }
+        [[maybe_unused]] [[nodiscard]] OrderSide getSide() const { return side; }
 
         void add(Orders::Order* order) {
             ASSERT(

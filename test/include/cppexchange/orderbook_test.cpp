@@ -12,7 +12,7 @@ using namespace Orders;
 using namespace CPPExchange;
 
 TEST_CASE("Empty order book") {
-    OrderBook order_book;
+    OrderBook order_book(0);
 
     auto top_ask = order_book.top(SELL);
     auto top_bid = order_book.top(BUY);
@@ -22,7 +22,7 @@ TEST_CASE("Empty order book") {
 }
 
 TEST_CASE("Insert one bid and one ask") {
-    OrderBook order_book;
+    OrderBook order_book(0);
 
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
@@ -49,7 +49,7 @@ TEST_CASE("Insert one bid and one ask") {
 }
 
 TEST_CASE("Insert second level order") {
-    OrderBook order_book;
+    OrderBook order_book(0);
 
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
@@ -64,7 +64,7 @@ TEST_CASE("Insert second level order") {
 }
 
 TEST_CASE("Remove order") {
-    OrderBook order_book;
+    OrderBook order_book(0);
 
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
