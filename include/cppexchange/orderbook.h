@@ -21,8 +21,13 @@ namespace CPPExchange {
               price_level_pool(Constants::MAX_PRICE_LEVELS),
               price_levels(Constants::MAX_PRICE_LEVELS, nullptr) {}
 
-        Orders::Order*
-        add(ClientIdT client_id, Orders::OrderSide side, QuantityT quantity, PriceT limit_price) {
+        Orders::Order* add(
+            OrderIdT order_id,
+            ClientIdT client_id,
+            Orders::OrderSide side,
+            QuantityT quantity,
+            PriceT limit_price
+        ) {
             ASSERT(
                 (side == Orders::OrderSide::BUY
                  && (UNLIKELY(best_asks == nullptr) || best_asks->getPrice() > limit_price))
@@ -36,7 +41,7 @@ namespace CPPExchange {
 
             auto order = order_pool.getObject(
                 ticker_id,
-                getNextOrderId(),
+                order_id,
                 client_id,
                 Helpers::getCurrentMsTimestamp(),
                 side,
@@ -71,14 +76,11 @@ namespace CPPExchange {
 
       private:
         TickerIdT ticker_id;
-        OrderIdT next_order_id = 1;
         Utils::ObjectPool<Orders::Order> order_pool;
         Utils::ObjectPool<Orders::OrdersPriceLevel> price_level_pool;
         std::vector<Orders::OrdersPriceLevel*> price_levels;
         Orders::OrdersPriceLevel* best_bids = nullptr;
         Orders::OrdersPriceLevel* best_asks = nullptr;
-
-        OrderIdT getNextOrderId() { return next_order_id++; }
 
         Orders::OrdersPriceLevel* getPriceLevel(PriceT price, Orders::OrderSide side) {
             auto price_level_index = getPriceLevelIndex(price);

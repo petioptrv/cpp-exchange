@@ -19,6 +19,7 @@ namespace CPPExchange {
      */
     class Exchange {
       private:
+        OrderIdT next_order_id = 1;
         std::unordered_map<TickerIdT, CPPExchange::OrderBook*> order_books_map;
         std::unordered_map<std::string, TickerIdT> tickers_map;
 
@@ -34,6 +35,8 @@ namespace CPPExchange {
 
             return tickers_map[ticker];
         }
+
+        OrderIdT getNextOrderId() { return next_order_id++; }
 
       public:
         Exchange()
@@ -71,12 +74,10 @@ namespace CPPExchange {
             PriceT limit_price
         ) {
             auto order_book = getOrderBook(ticker);
-            return order_book->add(client_id, side, quantity, limit_price);
+            return order_book->add(getNextOrderId(), client_id, side, quantity, limit_price);
         }
 
-        void removeOrder(Orders::Order* order) {
-            order_books_map[order->ticker_id]->remove(order);
-        }
+        void removeOrder(Orders::Order* order) { order_books_map[order->ticker_id]->remove(order); }
     };
 
 }  // namespace CPPExchange

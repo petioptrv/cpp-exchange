@@ -2,9 +2,10 @@
 // Created by Petio Petrov on 2024-07-22.
 //
 
+#include "cppexchange/orderbook.h"
+
 #include <doctest/doctest.h>
 
-#include "cppexchange/orderbook.h"
 #include "cppexchange/order.h"
 #include "cppexchange/typedefs.h"
 
@@ -24,24 +25,25 @@ TEST_CASE("Empty order book") {
 TEST_CASE("Insert one bid and one ask") {
     OrderBook order_book(0);
 
+    OrderIdT order_id = 0;
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
     PriceT price = 10;
 
-    auto order0 = order_book.add(client_id, BUY, top_of_book_quantity, price - 1);
+    auto order0 = order_book.add(order_id++, client_id, BUY, top_of_book_quantity, price - 1);
 
     CHECK(order0->ms_timestamp != MsTimestamp_INVALID);
-    CHECK(order0->order_id == 1);
+    CHECK(order0->order_id == 0);
 
     auto top_bid = order_book.top(BUY);
 
     CHECK(top_bid == order0);
 
-    auto order1 = order_book.add(client_id, SELL, top_of_book_quantity, price + 2);
+    auto order1 = order_book.add(order_id++, client_id, SELL, top_of_book_quantity, price + 2);
 
     CHECK(order1->ms_timestamp != MsTimestamp_INVALID);
     CHECK(order1->ms_timestamp >= order0->ms_timestamp);
-    CHECK(order1->order_id == 2);
+    CHECK(order1->order_id == 1);
 
     auto top_ask = order_book.top(SELL);
 
@@ -51,12 +53,13 @@ TEST_CASE("Insert one bid and one ask") {
 TEST_CASE("Insert second level order") {
     OrderBook order_book(0);
 
+    OrderIdT order_id = 0;
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
     PriceT price = 10;
 
-    order_book.add(client_id, BUY, top_of_book_quantity, price - 2);
-    auto order1 = order_book.add(client_id, BUY, top_of_book_quantity + 1, price - 1);
+    order_book.add(order_id++, client_id, BUY, top_of_book_quantity, price - 2);
+    auto order1 = order_book.add(order_id++, client_id, BUY, top_of_book_quantity + 1, price - 1);
 
     auto top_bid = order_book.top(BUY);
 
@@ -66,13 +69,14 @@ TEST_CASE("Insert second level order") {
 TEST_CASE("Remove order") {
     OrderBook order_book(0);
 
+    OrderIdT order_id = 0;
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
     PriceT price = 10;
 
-    auto order0 = order_book.add(client_id, BUY, top_of_book_quantity, price - 2);
-    auto order1 = order_book.add(client_id, BUY, top_of_book_quantity + 1, price - 1);
-    auto order2 = order_book.add(client_id, BUY, top_of_book_quantity + 1, price - 1);
+    auto order0 = order_book.add(order_id++, client_id, BUY, top_of_book_quantity, price - 2);
+    auto order1 = order_book.add(order_id++, client_id, BUY, top_of_book_quantity + 1, price - 1);
+    auto order2 = order_book.add(order_id++, client_id, BUY, top_of_book_quantity + 1, price - 1);
 
     auto top_bid = order_book.top(BUY);
 
