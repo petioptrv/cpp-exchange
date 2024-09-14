@@ -5,6 +5,11 @@
 - [ ] Check where is the order priority attribute used.
   - I suspect it's to return the information to the user.
 - [ ] Check how are price levels made non-hackable.
+- [ ] Currently, the price levels iterate over the orders linked-list to find the order to cancel.
+  - This needs to be made faster using a hash map at some point in the process.
+  - The book uses a map of client-ID to client-order-ids map (i.e. client_map\[cid\]\[coid\]).
+    - This approach puts the onus on the client to keep track of the IDs they have used in the range of allotted IDs
+      - This is actually quite common, and I wonder if this speeds up the process for real exchanges too....
 - [x] Verify why is the order reverse handle important.
   - It's used to be able to easily add an order to the end of the queue 
     (i.e. using the reverse handle of the top order).
@@ -51,5 +56,8 @@ of my order objects. Some of them had to be adapted.
 
 ### OrderBook and Matching Engine
 
-I have decided to separate the concerns of the order book (an efficient ledger for orders) and the matching engine
-(the logic for matching orders that cross each other).
+~~I have decided to separate the concerns of the order book (an efficient ledger for orders) and the matching engine
+(the logic for matching orders that cross each other).~~
+
+Upon revision, it makes much more sense to contain the entire order management logic inside the order book itself.
+This makes the exchange object a light-weight manager of order books.

@@ -12,11 +12,11 @@ using namespace Helpers;
 
 TEST_CASE("Order properties") {
     TickerIdT ticker_id = 0;
-    Order order(ticker_id, 0, 1, getCurrentMsTimestamp(), BUY, 4, 5);
+    Order order(ticker_id, 0, 1, getCurrentNsTimestamp(), OrderSide::BUY, 4, 5);
 
     CHECK(order.order_id == 0);
     CHECK(order.client_id == 1);
-    CHECK(order.side == BUY);
+    CHECK(order.side == OrderSide::BUY);
     CHECK(order.quantity == 4);
     CHECK(order.executed == 0);
 }
@@ -27,7 +27,7 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
     int order_count = 0;
     TickerIdT ticker_id = 0;
     OrderIdT first_order_id = 0;
-    MsTimestampT initial_ms_timestamp = getCurrentMsTimestamp();
+    NsTimestampT initial_ns_timestamp = getCurrentNsTimestamp();
     ClientIdT client_id = 2;
     QuantityT top_of_book_quantity = 5;
     PriceT price = 10;
@@ -40,8 +40,8 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
         ticker_id,
         first_order_id + order_count,
         client_id,
-        initial_ms_timestamp + std::chrono::milliseconds(order_count * 1000),
-        BUY,
+        initial_ns_timestamp + std::chrono::milliseconds(order_count * 1000).count(),
+        OrderSide::BUY,
         top_of_book_quantity + order_count,
         price
     );
@@ -54,8 +54,8 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
         ticker_id,
         first_order_id + order_count,
         client_id,
-        initial_ms_timestamp + std::chrono::milliseconds(order_count * 1000),
-        BUY,
+        initial_ns_timestamp + std::chrono::milliseconds(order_count * 1000).count(),
+        OrderSide::BUY,
         top_of_book_quantity + order_count,
         price
     );
@@ -63,11 +63,11 @@ TEST_CASE("OrdersAtPriceLevel adding and removing orders") {
 
     CHECK(price_level.top() == &order0);
 
-    price_level.remove(&order0);
+    price_level.cancel(order0.order_id);
 
     CHECK(price_level.top() == &order1);
 
-    price_level.remove(&order1);
+    price_level.cancel(order1.order_id);
 
     CHECK(price_level.top() == nullptr);
 }

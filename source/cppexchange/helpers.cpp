@@ -4,11 +4,11 @@
 
 #include "cppexchange/helpers.h"
 
-MsTimestampT Helpers::getCurrentMsTimestamp() {
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()
-    );
-    return ms;
+NsTimestampT Helpers::getCurrentNsTimestamp() {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   std::chrono::system_clock::now().time_since_epoch()
+        )
+            .count();
 }
 
 std::string

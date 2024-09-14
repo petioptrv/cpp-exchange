@@ -19,7 +19,7 @@ namespace Communication {
             return items_count_ == 0;
         }
 
-        void push(const T& item) {
+        void push(T&& item) {
             data_[next_write_index_] = item;
             next_write_index_ = (next_write_index_ + 1) % data_.size();
             items_count_ = std::min(
@@ -28,8 +28,8 @@ namespace Communication {
             );
         }
 
-        T pop() {
-            auto item = items_count_ ? data_[next_read_index_] : nullptr;
+        auto pop() {
+            auto item = items_count_ ? &data_[next_read_index_] : nullptr;
             if (item != nullptr) {
                 next_read_index_ = (next_read_index_ + 1) % data_.size();
                 --items_count_;

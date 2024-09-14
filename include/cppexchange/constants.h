@@ -17,4 +17,6 @@ namespace Constants {
                 // orders-by-price by modding the price by it, but this means we can set a price so
                 // extreme, it loops back around and goes to the front of the queue with an extreme
                 // price
+
+    constexpr size_t MAX_MARKET_UPDATES = 256 * 1024;
 }  // namespace Constants

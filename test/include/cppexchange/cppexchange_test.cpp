@@ -9,77 +9,87 @@
 #include <string>
 
 #include "cppexchange/order.h"
+#include "cppexchange/constants.h"
 
 using namespace std;
 using namespace CPPExchange;
 using namespace Orders;
+using namespace Constants;
 
-TEST_CASE("Add ticker") {
-    Exchange exchange;
-    string ticker = "SPY";
+TEST_CASE("Add tickers") {
+    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
+    MarketUpdateLFQueue market_update_queue(MAX_MARKET_UPDATES);
+    Exchange exchange(&client_response_queue, &market_update_queue);
 
-    exchange.addTicker(ticker);
-
-    CHECK(exchange.top(ticker, SELL) == nullptr);
-    CHECK(exchange.top(ticker, BUY) == nullptr);
+    exchange.addTicker(0);
+    exchange.addTicker(1);
 }
 
-TEST_CASE("Add limit order") {
-    string spy = "SPY";
-    string qqq = "QQQ";
-    Exchange exchange{{spy, qqq}};
+TEST_CASE("Add order") {
+    TickerIdT spy = 0;
+    TickerIdT qqq = 1;
+    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
+    MarketUpdateLFQueue market_update_queue(MAX_MARKET_UPDATES);
+    Exchange exchange(&client_response_queue, &market_update_queue, {spy, qqq});
 
     ClientIdT client_id = 2;
-    QuantityT top_of_book_quantity = 5;
+    QuantityT quantity = 5;
     PriceT price = 10;
 
-    auto order_spy = exchange.addOrder(spy, client_id, BUY, top_of_book_quantity, price - 1);
+    ClientResponse* update;
 
-    CHECK(order_spy->ms_timestamp != MsTimestamp_INVALID);
-    CHECK(order_spy->order_id == 1);
+    exchange.addOrder(spy, client_id, OrderSide::BUY, quantity, price - 1);
+    update = client_response_queue.pop();
 
-    auto top_bid_spy = exchange.top(spy, BUY);
-    auto top_bid_qqq = exchange.top(qqq, BUY);
+    CHECK(update->type == ResponseType::ACCEPTED);
+    CHECK(update->ticker_id == spy);
+    CHECK(update->order_id == 1);
+    CHECK(update->side == OrderSide::BUY);
+    CHECK(update->quantity == quantity);
+    CHECK(update->price == price - 1);
+    CHECK(update->ns_timestamp != NsTimestamp_INVALID);
 
-    CHECK(top_bid_spy == order_spy);
-    CHECK(top_bid_qqq == nullptr);
+    update = client_response_queue.pop();
 
-    auto order_qqq = exchange.addOrder(qqq, client_id, SELL, top_of_book_quantity, price + 2);
+    CHECK(update == nullptr);
 
-    CHECK(order_qqq->ms_timestamp != MsTimestamp_INVALID);
-    CHECK(order_qqq->ms_timestamp >= order_qqq->ms_timestamp);
-    CHECK(order_qqq->order_id == 2);
+    exchange.addOrder(qqq, client_id, OrderSide::SELL, quantity + 1, price + 2);
+    update = client_response_queue.pop();
 
-    auto top_ask_qqq = exchange.top(qqq, SELL);
-    auto top_ask_spy = exchange.top(spy, SELL);
-
-    CHECK(top_ask_qqq == order_qqq);
-    CHECK(top_ask_spy == nullptr);
+    CHECK(update->type == ResponseType::ACCEPTED);
+    CHECK(update->ticker_id == qqq);
+    CHECK(update->order_id == 2);
+    CHECK(update->side == OrderSide::SELL);
+    CHECK(update->quantity == quantity + 1);
+    CHECK(update->price == price + 2);
+    CHECK(update->ns_timestamp != NsTimestamp_INVALID);
 }
 
-TEST_CASE("Remove order") {
-    string ticker = "SPY";
-    Exchange exchange{{ticker}};
+TEST_CASE("Exchange cancel order") {
+    TickerIdT ticker_id = 0;
+    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
+    MarketUpdateLFQueue market_update_queue(MAX_MARKET_UPDATES);
+    Exchange exchange(&client_response_queue, &market_update_queue, { ticker_id });
 
     ClientIdT client_id = 2;
-    QuantityT top_of_book_quantity = 5;
+    QuantityT quantity = 5;
     PriceT price = 10;
 
-    auto order0 = exchange.addOrder(ticker, client_id, BUY, top_of_book_quantity, price - 2);
-    auto order1 = exchange.addOrder(ticker, client_id, BUY, top_of_book_quantity + 1, price - 1);
-    auto order2 = exchange.addOrder(ticker, client_id, BUY, top_of_book_quantity + 1, price - 1);
+    ClientResponse* update;
 
-    auto top_bid = exchange.top(ticker, BUY);
+    exchange.addOrder(ticker_id, client_id, OrderSide::BUY, quantity, price);
+    update = client_response_queue.pop();
+    auto add_ts = update->ns_timestamp;
 
-    CHECK(top_bid == order1);
+    exchange.cancelOrder(ticker_id, client_id, update->order_id, OrderSide::BUY, price);
 
-    exchange.removeOrder(order1);
-    top_bid = exchange.top(ticker, BUY);
+    update = client_response_queue.pop();
 
-    CHECK(top_bid == order2);
-
-    exchange.removeOrder(order2);
-    top_bid = exchange.top(ticker, BUY);
-
-    CHECK(top_bid == order0);
+    CHECK(update->type == ResponseType::CANCELED);
+    CHECK(update->ticker_id == ticker_id);
+    CHECK(update->order_id == 1);
+    CHECK(update->side == OrderSide::BUY);
+    CHECK(update->quantity == quantity);
+    CHECK(update->price == price);
+    CHECK(update->ns_timestamp > add_ts);
 }

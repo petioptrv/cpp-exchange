@@ -13,7 +13,7 @@ namespace Helpers {
     std::string
     getEnvWithDefault(const std::string& variable_name, const std::string& default_value);
 
-    MsTimestampT getCurrentMsTimestamp();
+    NsTimestampT getCurrentNsTimestamp();
 
     template <class T> class Singleton {
       public:

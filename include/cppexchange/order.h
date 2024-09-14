@@ -11,7 +11,7 @@
 
 namespace Orders {
 
-    enum OrderSide { BUY, SELL, INVALID };
+    enum class OrderSide : uint8_t { INVALID = 0, BUY = 1, SELL = 2 };
 
     struct Order {
         Order* previous = nullptr;
@@ -22,9 +22,9 @@ namespace Orders {
         ClientIdT client_id = ClientId_INVALID;
         QuantityT quantity = Quantity_INVALID;
         QuantityT executed{0};
-        MsTimestampT ms_timestamp = MsTimestamp_INVALID;
+        NsTimestampT ns_timestamp = NsTimestamp_INVALID;
         PriceT limit_price = Price_INVALID;
-        OrderSide side = INVALID;
+        OrderSide side = OrderSide::INVALID;
 
         Order() = default;
 
@@ -32,7 +32,7 @@ namespace Orders {
             TickerIdT ticker_id,
             OrderIdT order_id,
             ClientIdT client_id,
-            MsTimestampT ms_timestamp,
+            NsTimestampT ns_timestamp,
             OrderSide side,
             QuantityT quantity,
             PriceT limit_price
@@ -41,7 +41,7 @@ namespace Orders {
               order_id(order_id),
               client_id(client_id),
               quantity(quantity),
-              ms_timestamp(ms_timestamp),
+              ns_timestamp(ns_timestamp),
               limit_price(limit_price),
               side(side) {}
     };
@@ -71,35 +71,41 @@ namespace Orders {
         [[maybe_unused]] [[nodiscard]] OrderSide getSide() const { return side; }
 
         void add(Orders::Order* order) {
-            ASSERT(
-                order->limit_price == price_level, "Attempting to add an order to the wrong level."
-            );
             if (UNLIKELY(top_order == nullptr)) {
                 top_order = order;
                 order->previous = order->next = order;
                 side = order->side;
             } else {
-                order->next = top_order->previous;
-                top_order->previous->next = order;
+                order->next = top_order;
+                order->previous = top_order->previous;
+                order->previous->next = order;
                 top_order->previous = order;
             }
         }
 
-        void remove(Orders::Order* order) {
-            ASSERT(
-                order->limit_price == price_level,
-                "Attempting to remove an order from the wrong level."
-            );
-            order->previous->next = order->next;
-            order->next->previous = order->previous;
-            if (UNLIKELY(top_order == order)) {
-                if (UNLIKELY(top_order->next == top_order)) {
-                    top_order = nullptr;
-                } else {
-                    top_order = top_order->next;
-                }
+        Orders::Order* cancel(OrderIdT order_id) {
+            auto order = top_order;
+
+            while (order->order_id != order_id && order != top_order->previous) {
+                order = order->next;
             }
-            order->next = order->previous = nullptr;
+
+            if (order->order_id == order_id) {
+                order->previous->next = order->next;
+                order->next->previous = order->previous;
+                if (UNLIKELY(top_order == order)) {
+                    if (UNLIKELY(top_order->next == top_order)) {
+                        top_order = nullptr;
+                    } else {
+                        top_order = top_order->next;
+                    }
+                }
+                order->next = order->previous = nullptr;
+            } else {
+                order = nullptr;
+            }
+
+            return order;
         }
 
         Orders::Order* top() { return top_order; }
@@ -108,7 +114,7 @@ namespace Orders {
         OrdersPriceLevel* next_price_level = nullptr;
         PriceT price_level = Price_INVALID;
         Order* top_order = nullptr;
-        OrderSide side = INVALID;
+        OrderSide side = OrderSide::INVALID;
     };
 
 }  // namespace Orders

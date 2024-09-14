@@ -6,6 +6,7 @@
 #include "cppexchange/constants.h"
 #include "cppexchange/order.h"
 #include "cppexchange/orderbook.h"
+#include "cppexchange/updates.h"
 #include "utils/macros.h"
 
 namespace CPPExchange {
@@ -20,31 +21,28 @@ namespace CPPExchange {
     class Exchange {
       private:
         OrderIdT next_order_id = 1;
+        TradeIdT next_trade_id = 1;
         std::unordered_map<TickerIdT, CPPExchange::OrderBook*> order_books_map;
-        std::unordered_map<std::string, TickerIdT> tickers_map;
+        ClientResponseLFQueue* client_response_queue;
+        MarketUpdateLFQueue* market_update_queue;
 
-        inline CPPExchange::OrderBook* getOrderBook(const std::string& ticker) {
-            auto ticker_id = getTickerId(ticker);
+        inline CPPExchange::OrderBook* getOrderBook(const TickerIdT ticker_id) {
             return order_books_map[ticker_id];
-        }
-
-        inline std::size_t getTickerId(const std::string& ticker) {
-            if (UNLIKELY(!tickers_map.contains(ticker))) {
-                tickers_map[ticker] = tickers_map.size();
-            }
-
-            return tickers_map[ticker];
         }
 
         OrderIdT getNextOrderId() { return next_order_id++; }
 
       public:
-        Exchange()
-            : order_books_map(Constants::MAX_TICKERS), tickers_map(Constants::MAX_TICKERS) {};
-        explicit Exchange(const std::vector<std::string>& tickers)
-            : order_books_map(Constants::MAX_TICKERS), tickers_map(Constants::MAX_TICKERS) {
-            for (const auto& ticker : tickers) {
-                addTicker(ticker);
+        explicit Exchange(
+            ClientResponseLFQueue* client_response_queue,
+            MarketUpdateLFQueue* market_update_queue,
+            const std::vector<const TickerIdT>& ticker_ids = {}
+        )
+            : order_books_map(Constants::MAX_TICKERS),
+              client_response_queue(client_response_queue),
+              market_update_queue(market_update_queue) {
+            for (const auto& ticker_id : ticker_ids) {
+                addTicker(ticker_id);
             }
         }
         Exchange(const Exchange& other) = delete;
@@ -53,31 +51,35 @@ namespace CPPExchange {
         Exchange& operator=(Exchange& other) = delete;
         Exchange& operator=(Exchange&& other) = delete;
 
-        void addTicker(const std::string& ticker) {
+        void addTicker(const TickerIdT ticker_id) {
             ASSERT(order_books_map.size() != Constants::MAX_TICKERS, "Max tickers count reached");
-            auto ticker_id = getTickerId(ticker);
             if (LIKELY(!order_books_map.contains(ticker_id))) {
-                order_books_map[ticker_id] = new CPPExchange::OrderBook(ticker_id);
+                order_books_map[ticker_id] = new CPPExchange::OrderBook(
+                    ticker_id, client_response_queue, market_update_queue
+                );
             }
         }
 
-        Orders::Order* top(const std::string& ticker, Orders::OrderSide side) {
-            auto order_book = getOrderBook(ticker);
-            return order_book->top(side);
-        }
-
-        Orders::Order* addOrder(
-            const std::string& ticker,
+        void addOrder(
+            const TickerIdT ticker_id,
             ClientIdT client_id,
             Orders::OrderSide side,
             QuantityT quantity,
             PriceT limit_price
         ) {
-            auto order_book = getOrderBook(ticker);
-            return order_book->add(getNextOrderId(), client_id, side, quantity, limit_price);
+            auto order_book = getOrderBook(ticker_id);
+            order_book->add(getNextOrderId(), client_id, side, quantity, limit_price, next_trade_id);
         }
 
-        void removeOrder(Orders::Order* order) { order_books_map[order->ticker_id]->remove(order); }
+        void cancelOrder(
+            const TickerIdT ticker_id,
+            ClientIdT client_id,
+            OrderIdT order_id,
+            Orders::OrderSide side,
+            PriceT limit_price
+        ) {
+            order_books_map[ticker_id]->cancel(client_id, order_id, side, limit_price);
+        }
     };
 
 }  // namespace CPPExchange

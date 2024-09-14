@@ -20,10 +20,10 @@ TEST_CASE("LFQueue consume and produce no overflow") {
         int i;
     };
     int n = 10;
-    LFQueue<Int*> queue(n);
+    LFQueue<Int> queue(n);
 
     for (int i = 0; i != n; ++i) {
-        queue.push(new Int{i});
+        queue.push(Int{i});
     }
 
     for (int i = 0; i != n; ++i) {

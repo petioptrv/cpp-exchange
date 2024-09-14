@@ -18,14 +18,14 @@ TEST_CASE("Order object pool") {
     TickerIdT ticker_id = 0;
     ClientIdT client_id = 0;
 
-    Order* order_0 = p.getObject(ticker_id, 0, client_id, getCurrentMsTimestamp(), SELL, 1, 9);
-    Order* order_1 = p.getObject(ticker_id, 1, client_id, getCurrentMsTimestamp(), SELL, 2, 9);
+    Order* order_0 = p.getObject(ticker_id, 0, client_id, getCurrentNsTimestamp(), OrderSide::SELL, 1, 9);
+    Order* order_1 = p.getObject(ticker_id, 1, client_id, getCurrentNsTimestamp(), OrderSide::SELL, 2, 9);
 
     CHECK(order_0 != order_1);
 
     p.releaseObject(order_0);
     p.releaseObject(order_1);
 
-    p.getObject(ticker_id, 2, client_id, getCurrentMsTimestamp(), BUY, 2, 8);
-    p.getObject(ticker_id, 3, client_id, getCurrentMsTimestamp(), SELL, 2, 8);
+    p.getObject(ticker_id, 2, client_id, getCurrentNsTimestamp(), OrderSide::BUY, 2, 8);
+    p.getObject(ticker_id, 3, client_id, getCurrentNsTimestamp(), OrderSide::SELL, 2, 8);
 }

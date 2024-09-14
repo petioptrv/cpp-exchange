@@ -8,85 +8,246 @@
 #include "cppexchange/constants.h"
 #include "cppexchange/helpers.h"
 #include "cppexchange/order.h"
+#include "cppexchange/updates.h"
 #include "utils/object_pool.h"
 
 namespace CPPExchange {
     class OrderBook final {
-        // The OrderBook is an efficient ledger for orders. It does not implement order-matching
-        // logic.
       public:
-        explicit OrderBook(TickerIdT ticker_id)
+        explicit OrderBook(
+            const TickerIdT ticker_id,
+            ClientResponseLFQueue* client_response_queue,
+            MarketUpdateLFQueue* market_update_queue
+        )
             : ticker_id(ticker_id),
               order_pool(Constants::MAX_ORDER_IDS),
               price_level_pool(Constants::MAX_PRICE_LEVELS),
-              price_levels(Constants::MAX_PRICE_LEVELS, nullptr) {}
+              client_response_queue(client_response_queue),
+              market_update_queue(market_update_queue) {}
 
-        Orders::Order* add(
+        void add(
             OrderIdT order_id,
             ClientIdT client_id,
             Orders::OrderSide side,
             QuantityT quantity,
-            PriceT limit_price
+            PriceT limit_price,
+            TradeIdT& next_trade_id
         ) {
-            ASSERT(
-                (side == Orders::OrderSide::BUY
-                 && (UNLIKELY(best_asks == nullptr) || best_asks->getPrice() > limit_price))
-                    || (side == Orders::OrderSide::SELL
-                        && ((UNLIKELY(best_bids == nullptr) || best_bids->getPrice() < limit_price))
-                    ),
-                "Attempting to add an order to the wrong side of the order book"
+            client_response_queue->push(
+                {ResponseType::ACCEPTED,
+                 ticker_id,
+                 client_id,
+                 order_id,
+                 side,
+                 quantity,
+                 limit_price,
+                 Helpers::getCurrentNsTimestamp()}
             );
 
+            QuantityT remaining
+                = checkForMatch(order_id, client_id, side, quantity, limit_price, next_trade_id);
+
+            if (remaining != 0) {
+                auto price_level = getPriceLevel(limit_price, side, true);
+                auto order = order_pool.getObject(
+                    ticker_id,
+                    order_id,
+                    client_id,
+                    Helpers::getCurrentNsTimestamp(),
+                    side,
+                    remaining,
+                    limit_price
+                );
+
+                price_level->add(order);
+                market_update_queue->push(
+                    {UpdateType::ADD,
+                     ticker_id,
+                     order_id,
+                     TradeId_INVALID,
+                     side,
+                     remaining,
+                     limit_price,
+                     Helpers::getCurrentNsTimestamp()}
+                );
+            }
+        }
+
+        void
+        cancel(ClientIdT client_id, OrderIdT order_id, Orders::OrderSide side, PriceT limit_price) {
+            Orders::Order* order;
             auto price_level = getPriceLevel(limit_price, side);
 
-            auto order = order_pool.getObject(
-                ticker_id,
-                order_id,
-                client_id,
-                Helpers::getCurrentMsTimestamp(),
-                side,
-                quantity,
-                limit_price
-            );
-
-            price_level->add(order);
-
-            return order;
-        }
-
-        void remove(Orders::Order* order) {
-            auto price_level = getPriceLevel(order->limit_price, order->side);
-            price_level->remove(order);
-            if (price_level->top() == nullptr) {
-                removePriceLevel(price_level);
-            }
-        }
-
-        Orders::Order* top(Orders::OrderSide side) {
-            Orders::Order* order;
-
-            if (side == Orders::OrderSide::BUY) {
-                order = LIKELY(best_bids != nullptr) ? best_bids->top() : nullptr;
+            if (LIKELY(price_level != nullptr)) {
+                order = price_level->cancel(order_id);
+                if (price_level->top() == nullptr) {
+                    removePriceLevel(price_level);
+                }
             } else {
-                order = LIKELY(best_asks != nullptr) ? best_asks->top() : nullptr;
+                order = nullptr;
             }
 
-            return order;
+            if (order != nullptr) {
+                auto update_ns = Helpers::getCurrentNsTimestamp();
+                client_response_queue->push(
+                    {ResponseType::CANCELED,
+                     ticker_id,
+                     client_id,
+                     order_id,
+                     side,
+                     order->quantity,
+                     limit_price,
+                     update_ns}
+                );
+                market_update_queue->push(
+                    {UpdateType::REMOVE,
+                     ticker_id,
+                     order_id,
+                     TradeId_INVALID,
+                     side,
+                     order->quantity,
+                     limit_price,
+                     update_ns}
+                );
+            } else {
+                client_response_queue->push(
+                    {ResponseType::CANCEL_REJECTED,
+                     ticker_id,
+                     client_id,
+                     order_id,
+                     Orders::OrderSide::INVALID,
+                     Quantity_INVALID,
+                     Price_INVALID,
+                     Helpers::getCurrentNsTimestamp()}
+                );
+            }
         }
 
       private:
         TickerIdT ticker_id;
         Utils::ObjectPool<Orders::Order> order_pool;
         Utils::ObjectPool<Orders::OrdersPriceLevel> price_level_pool;
-        std::vector<Orders::OrdersPriceLevel*> price_levels;
+        std::array<Orders::OrdersPriceLevel*, Constants::MAX_PRICE_LEVELS> price_levels{};
         Orders::OrdersPriceLevel* best_bids = nullptr;
         Orders::OrdersPriceLevel* best_asks = nullptr;
 
-        Orders::OrdersPriceLevel* getPriceLevel(PriceT price, Orders::OrderSide side) {
+        ClientResponseLFQueue* client_response_queue;
+        MarketUpdateLFQueue* market_update_queue;
+
+        QuantityT checkForMatch(
+            OrderIdT order_id,
+            ClientIdT client_id,
+            Orders::OrderSide side,
+            QuantityT quantity,
+            PriceT limit_price,
+            TradeIdT& next_trade_id
+        ) {
+            Orders::Order* opposite_order;
+            if (side == Orders::OrderSide::BUY) {
+                while (quantity != 0 && best_asks != nullptr && best_asks->getPrice() <= limit_price
+                ) {
+                    opposite_order = best_asks->top();
+                    quantity
+                        = match(order_id, client_id, side, quantity, next_trade_id, opposite_order);
+                    if (best_asks->top() == nullptr) {
+                        removePriceLevel(best_asks);
+                    }
+                }
+            } else {
+                while (quantity != 0 && best_bids != nullptr && best_bids->getPrice() >= limit_price
+                ) {
+                    opposite_order = best_bids->top();
+                    quantity
+                        = match(order_id, client_id, side, quantity, next_trade_id, opposite_order);
+                    if (best_bids->top() == nullptr) {
+                        removePriceLevel(best_bids);
+                    }
+                }
+            }
+
+            return quantity;
+        }
+
+        QuantityT match(
+            OrderIdT order_id,
+            ClientIdT client_id,
+            Orders::OrderSide side,
+            QuantityT quantity,
+            TradeIdT& next_trade_id,
+            Orders::Order* opposite_order
+        ) {
+            QuantityT fill_quantity = std::min(quantity, opposite_order->quantity);
+
+            market_update_queue->push(
+                {UpdateType::TRADE,
+                 ticker_id,
+                 OrderId_INVALID,
+                 next_trade_id++,
+                 side,
+                 fill_quantity,
+                 opposite_order->limit_price,
+                 Helpers::getCurrentNsTimestamp()}
+            );
+
+            opposite_order->quantity -= fill_quantity;
+
+            if (opposite_order->quantity == 0) {
+                market_update_queue->push(
+                    {UpdateType::REMOVE,
+                     ticker_id,
+                     opposite_order->order_id,
+                     TradeId_INVALID,
+                     opposite_order->side,
+                     fill_quantity,
+                     opposite_order->limit_price,
+                     Helpers::getCurrentNsTimestamp()}
+                );
+                getPriceLevel(opposite_order->limit_price, side)->cancel(opposite_order->order_id);
+            } else {
+                market_update_queue->push(
+                    {UpdateType::MODIFY,
+                     ticker_id,
+                     opposite_order->order_id,
+                     TradeId_INVALID,
+                     opposite_order->side,
+                     opposite_order->quantity,
+                     opposite_order->limit_price,
+                     Helpers::getCurrentNsTimestamp()}
+                );
+            }
+
+            client_response_queue->push(
+                {ResponseType::FILLED,
+                 ticker_id,
+                 opposite_order->client_id,
+                 opposite_order->order_id,
+                 opposite_order->side,
+                 fill_quantity,
+                 opposite_order->limit_price,
+                 Helpers::getCurrentNsTimestamp()}
+            );
+            client_response_queue->push(
+                {ResponseType::FILLED,
+                 ticker_id,
+                 client_id,
+                 order_id,
+                 side,
+                 fill_quantity,
+                 opposite_order->limit_price,
+                 Helpers::getCurrentNsTimestamp()}
+            );
+
+            quantity -= fill_quantity;
+
+            return quantity;
+        }
+
+        Orders::OrdersPriceLevel*
+        getPriceLevel(PriceT price, Orders::OrderSide side, bool create_if_missing = false) {
             auto price_level_index = getPriceLevelIndex(price);
             auto price_level = price_levels[price_level_index];
 
-            if (UNLIKELY(price_level == nullptr)) {
+            if (UNLIKELY(price_level == nullptr && create_if_missing)) {
                 price_level = insertPriceLevel(price, side, price_level_index);
             }
 
