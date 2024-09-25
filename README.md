@@ -10,9 +10,14 @@
   - The book uses a map of client-ID to client-order-ids map (i.e. client_map\[cid\]\[coid\]).
     - This approach puts the onus on the client to keep track of the IDs they have used in the range of allotted IDs
       - This is actually quite common, and I wonder if this speeds up the process for real exchanges too....
-- [x] Verify why is the order reverse handle important.
+- [x] Verify why is the pointer to previous order important.
   - It's used to be able to easily add an order to the end of the queue 
-    (i.e. using the reverse handle of the top order).
+    (i.e. using the pointer to previous order of the top order).
+
+## To Investigate / Profile
+
+- [ ] Currently, message passing requires a copy of the message in the `Communication::LFQueue::push` method.
+  - Would restricting the usage to pre-allocated memory only have an effect on speed?
 
 ## Description
 
