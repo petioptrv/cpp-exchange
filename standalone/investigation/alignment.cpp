@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <cstdio>
 
+#include "cppexchange/messages.h"
 #include "cppexchange/order.h"
-#include "cppexchange/updates.h"
 
 using namespace CPPExchange;
 

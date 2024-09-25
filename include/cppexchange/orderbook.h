@@ -7,8 +7,8 @@
 #include "cppexchange/config.h"
 #include "cppexchange/constants.h"
 #include "cppexchange/helpers.h"
+#include "cppexchange/messages.h"
 #include "cppexchange/order.h"
-#include "cppexchange/updates.h"
 #include "utils/object_pool.h"
 
 namespace CPPExchange {

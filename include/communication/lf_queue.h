@@ -16,7 +16,7 @@ namespace Communication {
         explicit LFQueue(std::size_t n) : data_(n, T()) {}
 
         bool empty() {
-            return items_count_ == 0;
+            return items_count_.load() == 0;
         }
 
         void push(T&& item) {
@@ -29,7 +29,7 @@ namespace Communication {
         }
 
         auto pop() {
-            auto item = items_count_ ? &data_[next_read_index_] : nullptr;
+            auto item = items_count_.load() ? &data_[next_read_index_] : nullptr;
             if (item != nullptr) {
                 next_read_index_ = (next_read_index_ + 1) % data_.size();
                 --items_count_;

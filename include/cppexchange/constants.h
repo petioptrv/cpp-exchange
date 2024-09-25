@@ -18,5 +18,6 @@ namespace Constants {
                 // extreme, it loops back around and goes to the front of the queue with an extreme
                 // price
 
-    constexpr size_t MAX_MARKET_UPDATES = 256 * 1024;
+    constexpr size_t UPDATES_QUEUE_SIZE = 256 * 1024;
+    constexpr size_t REQUESTS_QUEUE_SIZE = 256 * 1024;
 }  // namespace Constants

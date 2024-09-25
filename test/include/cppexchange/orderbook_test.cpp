@@ -7,9 +7,9 @@
 #include <doctest/doctest.h>
 
 #include "cppexchange/constants.h"
+#include "cppexchange/messages.h"
 #include "cppexchange/order.h"
 #include "cppexchange/typedefs.h"
-#include "cppexchange/updates.h"
 
 using namespace Orders;
 using namespace CPPExchange;
@@ -17,8 +17,8 @@ using namespace Constants;
 
 TEST_CASE("Insert one bid and one ask maker orders") {
     TickerIdT ticker_id = 0;
-    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
-    MarketUpdateLFQueue market_update_queue(MAX_MARKET_UPDATES);
+    ClientResponseLFQueue client_response_queue(UPDATES_QUEUE_SIZE);
+    MarketUpdateLFQueue market_update_queue(UPDATES_QUEUE_SIZE);
     OrderBook order_book(ticker_id, &client_response_queue, &market_update_queue);
 
     OrderIdT order_id = 0;
@@ -77,8 +77,8 @@ TEST_CASE("Insert one bid and one ask maker orders") {
 
 TEST_CASE("Orderbook cancel order") {
     TickerIdT ticker_id = 0;
-    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
-    MarketUpdateLFQueue market_updates_queue(MAX_MARKET_UPDATES);
+    ClientResponseLFQueue client_response_queue(UPDATES_QUEUE_SIZE);
+    MarketUpdateLFQueue market_updates_queue(UPDATES_QUEUE_SIZE);
     OrderBook order_book(ticker_id, &client_response_queue, &market_updates_queue);
 
     OrderIdT order_id = 0;
@@ -130,8 +130,8 @@ TEST_CASE("Add ask taker order, fully filled by single maker") {
     PriceT ask_price = 10;
     TradeIdT next_trade_id = 1;
 
-    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
-    MarketUpdateLFQueue market_updates_queue(MAX_MARKET_UPDATES);
+    ClientResponseLFQueue client_response_queue(UPDATES_QUEUE_SIZE);
+    MarketUpdateLFQueue market_updates_queue(UPDATES_QUEUE_SIZE);
     OrderBook order_book(ticker_id, &client_response_queue, &market_updates_queue);
 
     ClientResponse* client_response;
@@ -230,8 +230,8 @@ TEST_CASE("Add ask taker order, fully filled by multiple makers") {
 
     TradeIdT next_trade_id = 1;
 
-    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
-    MarketUpdateLFQueue market_updates_queue(MAX_MARKET_UPDATES);
+    ClientResponseLFQueue client_response_queue(UPDATES_QUEUE_SIZE);
+    MarketUpdateLFQueue market_updates_queue(UPDATES_QUEUE_SIZE);
     OrderBook order_book(ticker_id, &client_response_queue, &market_updates_queue);
 
     ClientResponse* client_response;
@@ -368,8 +368,8 @@ TEST_CASE("Add ask taker order, partially filled") {
     PriceT ask_price = 10;
     TradeIdT next_trade_id = 1;
 
-    ClientResponseLFQueue client_response_queue(MAX_MARKET_UPDATES);
-    MarketUpdateLFQueue market_updates_queue(MAX_MARKET_UPDATES);
+    ClientResponseLFQueue client_response_queue(UPDATES_QUEUE_SIZE);
+    MarketUpdateLFQueue market_updates_queue(UPDATES_QUEUE_SIZE);
     OrderBook order_book(ticker_id, &client_response_queue, &market_updates_queue);
 
     ClientResponse* client_response;
