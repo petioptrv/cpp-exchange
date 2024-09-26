@@ -127,7 +127,7 @@ namespace CPPExchange {
         TickerIdT ticker_id;
         Utils::ObjectPool<Orders::Order> order_pool;
         Utils::ObjectPool<Orders::OrdersPriceLevel> price_level_pool;
-        std::array<Orders::OrdersPriceLevel*, Constants::MAX_PRICE_LEVELS> price_levels{};
+        std::unordered_map<PriceT, Orders::OrdersPriceLevel*> price_levels{};
         Orders::OrdersPriceLevel* best_bids = nullptr;
         Orders::OrdersPriceLevel* best_asks = nullptr;
 
@@ -318,7 +318,7 @@ namespace CPPExchange {
         }
 
         static inline size_t getPriceLevelIndex(PriceT price) {
-            return price % Constants::MAX_PRICE_LEVELS;
+            return price; // % Constants::MAX_PRICE_LEVELS;
         }
     };
 

@@ -4,14 +4,15 @@
 
 - [ ] Check where is the order priority attribute used.
   - I suspect it's to return the information to the user.
-- [ ] Check how are price levels made non-hackable.
 - [ ] Currently, the price levels iterate over the orders linked-list to find the order to cancel.
   - This needs to be made faster using a hash map at some point in the process.
   - The book uses a map of client-ID to client-order-ids map (i.e. client_map\[cid\]\[coid\]).
     - This approach puts the onus on the client to keep track of the IDs they have used in the range of allotted IDs
       - This is actually quite common, and I wonder if this speeds up the process for real exchanges too....
+- [x] Check how are price levels made non-hackable.
+  - The book's implementation is hackable (see [below](#price-hack)).
 - [x] Verify why is the pointer to previous order important.
-  - It's used to be able to easily add an order to the end of the queue 
+  - It's used to be able to easily add an order to the end of the queue
     (i.e. using the pointer to previous order of the top order).
 
 ## To Investigate / Profile
@@ -66,3 +67,16 @@ of my order objects. Some of them had to be adapted.
 
 Upon revision, it makes much more sense to contain the entire order management logic inside the order book itself.
 This makes the exchange object a light-weight manager of order books.
+
+### BLLA Price Hack
+
+The BLLA book's implementation contains a bug where, starting with an empty order book, if two sell orders of respective
+prices `i + ME_MAX_PRICE_LEVELS` (my code renames `ME_MAX_PRICE_LEVELS` to `MAX_PRICE_LEVELS`) and `i` are placed in
+succession, the second order will be placed on the same price level as the first, but will have lower priority. If then
+a buy order for price lower than `i + ME_MAX_PRICE_LEVELS` is placed, no orders will be filled.
+
+Problem fixed by keeping the price levels in a `std::unordered_map` instead of `std::array`, eliminating the modulo
+operation on the price and instead indexing by the price proper. This approach is less efficient, but a quick
+fix to the issue.
+
+This approach is still hackable via the object pool, but I will simulate "good-actor" traders only.

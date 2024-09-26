@@ -358,6 +358,101 @@ TEST_CASE("Add ask taker order, fully filled by multiple makers") {
     CHECK(client_response->quantity == third_maker_quantity - 1);
 }
 
+TEST_CASE("Price wrap-around") {
+    /*
+     * ASKS
+     * Price                    Size
+     *
+     * 10 + MAX_PRICE_LEVELS    1
+     * 10                       1
+     */
+
+    TickerIdT ticker_id = 0;
+
+    OrderIdT next_order_id = 1;
+    OrderIdT first_maker_order_id = next_order_id++;
+    OrderIdT second_maker_order_id = next_order_id++;
+    OrderIdT taker_order_id = next_order_id++;
+
+    ClientIdT next_client_id = 1;
+    ClientIdT first_maker_client_id = next_client_id++;
+    ClientIdT second_maker_client_id = next_client_id++;
+    ClientIdT taker_client_id = next_client_id++;
+
+    QuantityT first_maker_quantity = 1;
+    QuantityT second_maker_quantity = 1;
+    QuantityT taker_quantity = 1;
+
+    PriceT faulty_ask_price = 10 + MAX_PRICE_LEVELS; // loop around
+    PriceT good_ask_price = 10;
+
+    TradeIdT next_trade_id = 1;
+
+    ClientResponseLFQueue client_response_queue(UPDATES_QUEUE_SIZE);
+    MarketUpdateLFQueue market_updates_queue(UPDATES_QUEUE_SIZE);
+    OrderBook order_book(ticker_id, &client_response_queue, &market_updates_queue);
+
+    ClientResponse* client_response;
+    MarketUpdate* market_update;
+
+    order_book.add(
+        first_maker_order_id,
+        first_maker_client_id,
+        OrderSide::SELL,
+        first_maker_quantity,
+        faulty_ask_price,
+        next_trade_id
+    );
+    client_response_queue.pop(); // first maker accepted
+    market_updates_queue.pop();  // first maker added
+
+    order_book.add(
+        second_maker_order_id,
+        second_maker_client_id,
+        OrderSide::SELL,
+        second_maker_quantity,
+        good_ask_price,
+        next_trade_id
+    );
+    client_response_queue.pop(); // second maker accepted
+    market_updates_queue.pop();  // second maker added
+
+    order_book.add(
+        taker_order_id,
+        taker_client_id,
+        OrderSide::BUY,
+        taker_quantity,
+        good_ask_price,
+        next_trade_id
+    );
+    client_response_queue.pop(); // taker accepted
+
+    market_update = market_updates_queue.pop(); // trade — second maker filled
+
+    CHECK(market_update->type == UpdateType::TRADE);
+    CHECK(market_update->trade_id == 1);
+    CHECK(market_update->side == OrderSide::BUY); // the taker side
+    CHECK(market_update->quantity == second_maker_quantity);
+    CHECK(market_update->price == good_ask_price); // maker price
+
+    market_update = market_updates_queue.pop(); // remove second maker order
+
+    CHECK(market_update->type == UpdateType::REMOVE);
+    CHECK(market_update->order_id == second_maker_order_id);
+
+    client_response = client_response_queue.pop(); // second maker order filled
+
+    CHECK(client_response->type == ResponseType::FILLED);
+    CHECK(client_response->client_id == second_maker_client_id);
+    CHECK(client_response->order_id == second_maker_order_id);
+
+    client_response = client_response_queue.pop(); // taker order filled
+
+    CHECK(client_response->type == ResponseType::FILLED);
+    CHECK(client_response->order_id == taker_order_id);
+    CHECK(client_response->quantity == second_maker_quantity);
+}
+
 TEST_CASE("Add ask taker order, partially filled") {
     TickerIdT ticker_id = 0;
     OrderIdT maker_order_id = 1;
