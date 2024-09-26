@@ -6,7 +6,7 @@
   - I suspect it's to return the information to the user.
 - [ ] Currently, the price levels iterate over the orders linked-list to find the order to cancel.
   - This needs to be made faster using a hash map at some point in the process.
-  - The book uses a map of client-ID to client-order-ids map (i.e. client_map\[cid\]\[coid\]).
+  - The book uses a map of client-ID to client-order-ids map (i.e. `client_map[cid][coid]`).
     - This approach puts the onus on the client to keep track of the IDs they have used in the range of allotted IDs
       - This is actually quite common, and I wonder if this speeds up the process for real exchanges too....
 - [x] Check how are price levels made non-hackable.
@@ -68,7 +68,7 @@ of my order objects. Some of them had to be adapted.
 Upon revision, it makes much more sense to contain the entire order management logic inside the order book itself.
 This makes the exchange object a light-weight manager of order books.
 
-### BLLA Price Hack
+### Price Hack
 
 The BLLA book's implementation contains a bug where, starting with an empty order book, if two sell orders of respective
 prices `i + ME_MAX_PRICE_LEVELS` (my code renames `ME_MAX_PRICE_LEVELS` to `MAX_PRICE_LEVELS`) and `i` are placed in
