@@ -77,6 +77,6 @@ a buy order for price lower than `i + ME_MAX_PRICE_LEVELS` is placed, no orders 
 
 Problem fixed by keeping the price levels in a `std::unordered_map` instead of `std::array`, eliminating the modulo
 operation on the price and instead indexing by the price proper. This approach is less efficient, but a quick
-fix to the issue.
+fix to the issue. It takes the implementation from $O(1)$ to $O(\log n)$, which is 17 steps for 128 * 1024 price levels.
 
-This approach is still hackable via the object pool, but I will simulate "good-actor" traders only.
+This approach is still hackable via overflowing the object pool, but I will simulate "good-actor" traders only.

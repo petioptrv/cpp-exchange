@@ -12,7 +12,7 @@ namespace Constants {
     constexpr size_t MAX_NUM_CLIENTS = 256;
     constexpr size_t MAX_TICKERS = 16;
     constexpr size_t MAX_ORDER_IDS = 1024 * 1024;
-    constexpr size_t MAX_PRICE_LEVELS = 124 * 1024; // ~1K$ price spread
+    constexpr size_t MAX_PRICE_LEVELS = 128 * 1024; // ~1K$ price spread
 
     constexpr size_t UPDATES_QUEUE_SIZE = 256 * 1024;
     constexpr size_t REQUESTS_QUEUE_SIZE = 256 * 1024;
