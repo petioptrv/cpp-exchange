@@ -22,7 +22,7 @@
 
 ## Description
 
-This repo uses [ModernCppStarter](MODERN_CPP_STARTER_README.md).
+This repo is based on [ModernCppStarter](MODERN_CPP_STARTER_README.md).
 
 This repo is my low-level, no-LLM, non-soy attempt to implement an exchange in C++. The goal is to gain practical
 experience with low-latency applications and optimization. 
@@ -76,7 +76,7 @@ succession, the second order will be placed on the same price level as the first
 a buy order for price lower than `i + ME_MAX_PRICE_LEVELS` is placed, no orders will be filled.
 
 Problem fixed by keeping the price levels in a `std::unordered_map` instead of `std::array`, eliminating the modulo
-operation on the price and instead indexing by the price proper. This approach is less efficient, but a quick
-fix to the issue. It takes the implementation from $O(1)$ to $O(\log n)$, which is 17 steps for 128 * 1024 price levels.
+operation on the price and instead indexing by the price proper. This approach is slightly less efficient, but remains
+$O(1)$ amortized.
 
 This approach is still hackable via overflowing the object pool, but I will simulate "good-actor" traders only.
