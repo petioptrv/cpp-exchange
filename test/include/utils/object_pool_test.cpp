@@ -11,7 +11,7 @@
 
 using namespace Utils;
 using namespace Orders;
-using namespace Common;
+using namespace Utils;
 
 TEST_CASE("Order object pool") {
     ObjectPool<Order> p(3);

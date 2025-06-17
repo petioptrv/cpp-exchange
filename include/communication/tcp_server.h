@@ -7,7 +7,7 @@
 #include "tcp_socket.h"
 #include "utils/time_utils.h"
 
-namespace Common {
+namespace Utils {
     struct TCPServer {
         explicit TCPServer() {}
 
@@ -115,7 +115,7 @@ namespace Common {
         std::vector<TCPSocket *> receive_sockets_, send_sockets_;
 
         /// Function wrapper to call back when data is available.
-        std::function<void(TCPSocket *s, Common::NsTimestampT rx_time)> recv_callback_ = nullptr;
+        std::function<void(TCPSocket *s, Utils::NsTimestampT rx_time)> recv_callback_ = nullptr;
         /// Function wrapper to call back when all data across all TCPSockets has been read and dispatched this round.
         std::function<void()> recv_finished_callback_ = nullptr;
 

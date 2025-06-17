@@ -22,7 +22,7 @@ namespace Orders {
         ClientIdT client_id = ClientId_INVALID;
         QuantityT quantity = Quantity_INVALID;
         QuantityT executed{0};
-        Common::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+        Utils::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
         PriceT limit_price = Price_INVALID;
         OrderSide side = OrderSide::INVALID;
 
@@ -32,7 +32,7 @@ namespace Orders {
             TickerIdT ticker_id,
             OrderIdT order_id,
             ClientIdT client_id,
-            Common::NsTimestampT ns_timestamp,
+            Utils::NsTimestampT ns_timestamp,
             OrderSide side,
             QuantityT quantity,
             PriceT limit_price

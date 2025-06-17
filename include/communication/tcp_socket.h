@@ -9,7 +9,7 @@
 #include "socket_utils.h"
 #include "utils/time_utils.h"
 
-namespace Common {
+namespace Utils {
     /// Size of our send and receive buffers in bytes.
     constexpr size_t TCPBufferSize = 64 * 1024 * 1024;
 
@@ -56,7 +56,7 @@ namespace Common {
             if (read_size > 0) {
                 next_rcv_valid_index_ += read_size;
 
-                Common::NsTimestampT kernel_time = 0;
+                NsTimestampT kernel_time = 0;
                 timeval time_kernel;
                 if (cmsg->cmsg_level == SOL_SOCKET &&
                     cmsg->cmsg_type == SCM_TIMESTAMP &&
@@ -105,7 +105,7 @@ namespace Common {
         struct sockaddr_in socket_attrib_{};
 
         /// Function wrapper to callback when there is data to be processed.
-        std::function<void(TCPSocket *s, Common::NsTimestampT rx_time)> recv_callback_ = nullptr;
+        std::function<void(TCPSocket *s, NsTimestampT rx_time)> recv_callback_ = nullptr;
 
         std::string time_str_;
     };

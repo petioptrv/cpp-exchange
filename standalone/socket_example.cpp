@@ -4,7 +4,7 @@
 #include "communication/tcp_server.h"
 
 int main(int, char **) {
-  using namespace Common;
+  using namespace Utils;
 
   std::string time_str_;
 

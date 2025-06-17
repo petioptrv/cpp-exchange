@@ -6,7 +6,7 @@
 #include "utils/time_utils.h"
 
 using namespace CPPExchange;
-using namespace Common;
+using namespace Utils;
 
 void checkOrderMemoryAlignment() {
     printf(

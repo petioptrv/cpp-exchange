@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-Common::NsTimestampT Common::getCurrentNsTimestamp() {
+Utils::NsTimestampT Utils::getCurrentNsTimestamp() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(
                std::chrono::system_clock::now().time_since_epoch()
     )

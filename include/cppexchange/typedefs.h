@@ -20,6 +20,6 @@ constexpr auto TickerId_INVALID = std::numeric_limits<OrderIdT>::max();
 constexpr auto OrderId_INVALID = std::numeric_limits<OrderIdT>::max();
 constexpr auto TradeId_INVALID = std::numeric_limits<TradeIdT>::max();
 constexpr auto ClientId_INVALID = std::numeric_limits<ClientIdT>::max();
-constexpr auto NsTimestamp_INVALID = std::numeric_limits<Common::NsTimestampT>::max();
+constexpr auto NsTimestamp_INVALID = std::numeric_limits<Utils::NsTimestampT>::max();
 constexpr auto Quantity_INVALID = std::numeric_limits<QuantityT>::max();
 constexpr auto Price_INVALID = std::numeric_limits<PriceT>::max();

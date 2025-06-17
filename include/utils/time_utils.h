@@ -5,7 +5,7 @@
 #pragma once
 #include <cstdint>
 
-namespace Common {
+namespace Utils {
     typedef long long NsTimestampT;
 
     constexpr NsTimestampT NANOS_TO_MICROS = 1000;

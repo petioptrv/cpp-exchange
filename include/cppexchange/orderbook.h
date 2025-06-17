@@ -40,7 +40,7 @@ namespace CPPExchange {
                  side,
                  quantity,
                  limit_price,
-                 Common::getCurrentNsTimestamp()}
+                 Utils::getCurrentNsTimestamp()}
             );
 
             QuantityT remaining
@@ -52,7 +52,7 @@ namespace CPPExchange {
                     ticker_id,
                     order_id,
                     client_id,
-                    Common::getCurrentNsTimestamp(),
+                    Utils::getCurrentNsTimestamp(),
                     side,
                     remaining,
                     limit_price
@@ -67,7 +67,7 @@ namespace CPPExchange {
                      side,
                      remaining,
                      limit_price,
-                     Common::getCurrentNsTimestamp()}
+                     Utils::getCurrentNsTimestamp()}
                 );
             }
         }
@@ -87,7 +87,7 @@ namespace CPPExchange {
             }
 
             if (order != nullptr) {
-                auto update_ns = Common::getCurrentNsTimestamp();
+                auto update_ns = Utils::getCurrentNsTimestamp();
                 client_response_queue->push(
                     {CPPExchange::ResponseType::CANCELED,
                      ticker_id,
@@ -117,7 +117,7 @@ namespace CPPExchange {
                      Orders::OrderSide::INVALID,
                      Quantity_INVALID,
                      Price_INVALID,
-                     Common::getCurrentNsTimestamp()}
+                     Utils::getCurrentNsTimestamp()}
                 );
             }
         }
@@ -185,7 +185,7 @@ namespace CPPExchange {
                  side,
                  fill_quantity,
                  opposite_order->limit_price,
-                 Common::getCurrentNsTimestamp()}
+                 Utils::getCurrentNsTimestamp()}
             );
 
             opposite_order->quantity -= fill_quantity;
@@ -199,7 +199,7 @@ namespace CPPExchange {
                      opposite_order->side,
                      fill_quantity,
                      opposite_order->limit_price,
-                     Common::getCurrentNsTimestamp()}
+                     Utils::getCurrentNsTimestamp()}
                 );
                 getPriceLevel(opposite_order->limit_price, side)->cancel(opposite_order->order_id);
             } else {
@@ -211,7 +211,7 @@ namespace CPPExchange {
                      opposite_order->side,
                      opposite_order->quantity,
                      opposite_order->limit_price,
-                     Common::getCurrentNsTimestamp()}
+                     Utils::getCurrentNsTimestamp()}
                 );
             }
 
@@ -223,7 +223,7 @@ namespace CPPExchange {
                  opposite_order->side,
                  fill_quantity,
                  opposite_order->limit_price,
-                 Common::getCurrentNsTimestamp()}
+                 Utils::getCurrentNsTimestamp()}
             );
             client_response_queue->push(
                 {CPPExchange::ResponseType::FILLED,
@@ -233,7 +233,7 @@ namespace CPPExchange {
                  side,
                  fill_quantity,
                  opposite_order->limit_price,
-                 Common::getCurrentNsTimestamp()}
+                 Utils::getCurrentNsTimestamp()}
             );
 
             quantity -= fill_quantity;

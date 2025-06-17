@@ -9,7 +9,7 @@
 #include "utils/time_utils.h"
 
 using namespace Orders;
-using namespace Common;
+using namespace Utils;
 
 TEST_CASE("Order properties") {
     TickerIdT ticker_id = 0;

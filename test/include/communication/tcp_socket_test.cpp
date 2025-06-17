@@ -22,12 +22,12 @@ TEST_CASE("Create socket, send and receive") {
     const Communication::SocketCfg server_cfg{"", iface, port, false, true};
     const Communication::SocketCfg client_cfg{ip, iface, port, false, false};
 
-    Common::TCPSocket server_listener_socket;
-    Common::TCPSocket server_receiver_socket;
-    Common::TCPSocket client_socket;
+    Utils::TCPSocket server_listener_socket;
+    Utils::TCPSocket server_receiver_socket;
+    Utils::TCPSocket client_socket;
     int received_value;
 
-    server_receiver_socket.recv_callback_ = [&](Common::TCPSocket* s, Common::NsTimestampT) {
+    server_receiver_socket.recv_callback_ = [&](Utils::TCPSocket* s, Utils::NsTimestampT) {
         int val = 0;
         memcpy(&val, s->inbound_data_.data(), sizeof(int));
         received_value = val;
