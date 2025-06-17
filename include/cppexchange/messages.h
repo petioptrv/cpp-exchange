@@ -43,7 +43,7 @@ namespace CPPExchange {
         Orders::OrderSide side = Orders::OrderSide::INVALID;
         QuantityT quantity = Quantity_INVALID;
         PriceT price = Price_INVALID;
-        NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+        Common::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
     };
 
     enum class UpdateType : uint8_t { INVALID = 0, ADD = 1, MODIFY = 2, REMOVE = 3, TRADE = 4 };
@@ -56,7 +56,7 @@ namespace CPPExchange {
         Orders::OrderSide side = Orders::OrderSide::INVALID;
         QuantityT quantity = Quantity_INVALID;
         PriceT price = Price_INVALID;
-        NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+        Common::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
     };
 
 #pragma pack(pop)

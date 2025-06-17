@@ -3,12 +3,13 @@
 //
 
 #include "cppexchange/order.h"
-#include "cppexchange/helpers.h"
 
 #include <doctest/doctest.h>
 
+#include "utils/time_utils.h"
+
 using namespace Orders;
-using namespace Helpers;
+using namespace Common;
 
 TEST_CASE("Order properties") {
     TickerIdT ticker_id = 0;

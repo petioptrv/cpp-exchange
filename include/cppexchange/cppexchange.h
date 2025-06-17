@@ -79,7 +79,7 @@ namespace CPPExchange {
             ClientRequestLFQueue* client_request_queue,
             ClientResponseLFQueue* client_response_queue,
             MarketUpdateLFQueue* market_update_queue,
-            const std::vector<const TickerIdT>& ticker_ids = {}
+            const std::vector<TickerIdT>& ticker_ids = {}
         )
             : order_books_map(Constants::MAX_TICKERS),
               client_request_queue(client_request_queue),

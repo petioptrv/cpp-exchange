@@ -80,3 +80,8 @@ operation on the price and instead indexing by the price proper. This approach i
 $O(1)$ amortized.
 
 This approach is still hackable via overflowing the object pool, but I will simulate "good-actor" traders only.
+
+## Dependencies
+
+- `libevent`
+- `pkg-config`

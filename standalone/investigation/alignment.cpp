@@ -3,8 +3,10 @@
 
 #include "cppexchange/messages.h"
 #include "cppexchange/order.h"
+#include "utils/time_utils.h"
 
 using namespace CPPExchange;
+using namespace Common;
 
 void checkOrderMemoryAlignment() {
     printf(

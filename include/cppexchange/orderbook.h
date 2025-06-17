@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "cppexchange/config.h"
 #include "cppexchange/constants.h"
-#include "cppexchange/helpers.h"
 #include "cppexchange/messages.h"
 #include "cppexchange/order.h"
+#include "utils/time_utils.h"
 #include "utils/object_pool.h"
 
 namespace CPPExchange {
@@ -16,8 +15,8 @@ namespace CPPExchange {
       public:
         explicit OrderBook(
             const TickerIdT ticker_id,
-            ClientResponseLFQueue* client_response_queue,
-            MarketUpdateLFQueue* market_update_queue
+            CPPExchange::ClientResponseLFQueue* client_response_queue,
+            CPPExchange::MarketUpdateLFQueue* market_update_queue
         )
             : ticker_id(ticker_id),
               order_pool(Constants::MAX_ORDER_IDS),
@@ -34,14 +33,14 @@ namespace CPPExchange {
             TradeIdT& next_trade_id
         ) {
             client_response_queue->push(
-                {ResponseType::ACCEPTED,
+                {CPPExchange::ResponseType::ACCEPTED,
                  ticker_id,
                  client_id,
                  order_id,
                  side,
                  quantity,
                  limit_price,
-                 Helpers::getCurrentNsTimestamp()}
+                 Common::getCurrentNsTimestamp()}
             );
 
             QuantityT remaining
@@ -53,7 +52,7 @@ namespace CPPExchange {
                     ticker_id,
                     order_id,
                     client_id,
-                    Helpers::getCurrentNsTimestamp(),
+                    Common::getCurrentNsTimestamp(),
                     side,
                     remaining,
                     limit_price
@@ -61,14 +60,14 @@ namespace CPPExchange {
 
                 price_level->add(order);
                 market_update_queue->push(
-                    {UpdateType::ADD,
+                    {CPPExchange::UpdateType::ADD,
                      ticker_id,
                      order_id,
                      TradeId_INVALID,
                      side,
                      remaining,
                      limit_price,
-                     Helpers::getCurrentNsTimestamp()}
+                     Common::getCurrentNsTimestamp()}
                 );
             }
         }
@@ -88,9 +87,9 @@ namespace CPPExchange {
             }
 
             if (order != nullptr) {
-                auto update_ns = Helpers::getCurrentNsTimestamp();
+                auto update_ns = Common::getCurrentNsTimestamp();
                 client_response_queue->push(
-                    {ResponseType::CANCELED,
+                    {CPPExchange::ResponseType::CANCELED,
                      ticker_id,
                      client_id,
                      order_id,
@@ -100,7 +99,7 @@ namespace CPPExchange {
                      update_ns}
                 );
                 market_update_queue->push(
-                    {UpdateType::REMOVE,
+                    {CPPExchange::UpdateType::REMOVE,
                      ticker_id,
                      order_id,
                      TradeId_INVALID,
@@ -111,14 +110,14 @@ namespace CPPExchange {
                 );
             } else {
                 client_response_queue->push(
-                    {ResponseType::CANCEL_REJECTED,
+                    {CPPExchange::ResponseType::CANCEL_REJECTED,
                      ticker_id,
                      client_id,
                      order_id,
                      Orders::OrderSide::INVALID,
                      Quantity_INVALID,
                      Price_INVALID,
-                     Helpers::getCurrentNsTimestamp()}
+                     Common::getCurrentNsTimestamp()}
                 );
             }
         }
@@ -131,8 +130,8 @@ namespace CPPExchange {
         Orders::OrdersPriceLevel* best_bids = nullptr;
         Orders::OrdersPriceLevel* best_asks = nullptr;
 
-        ClientResponseLFQueue* client_response_queue;
-        MarketUpdateLFQueue* market_update_queue;
+        CPPExchange::ClientResponseLFQueue* client_response_queue;
+        CPPExchange::MarketUpdateLFQueue* market_update_queue;
 
         QuantityT checkForMatch(
             OrderIdT order_id,
@@ -179,62 +178,62 @@ namespace CPPExchange {
             QuantityT fill_quantity = std::min(quantity, opposite_order->quantity);
 
             market_update_queue->push(
-                {UpdateType::TRADE,
+                {CPPExchange::UpdateType::TRADE,
                  ticker_id,
                  OrderId_INVALID,
                  next_trade_id++,
                  side,
                  fill_quantity,
                  opposite_order->limit_price,
-                 Helpers::getCurrentNsTimestamp()}
+                 Common::getCurrentNsTimestamp()}
             );
 
             opposite_order->quantity -= fill_quantity;
 
             if (opposite_order->quantity == 0) {
                 market_update_queue->push(
-                    {UpdateType::REMOVE,
+                    {CPPExchange::UpdateType::REMOVE,
                      ticker_id,
                      opposite_order->order_id,
                      TradeId_INVALID,
                      opposite_order->side,
                      fill_quantity,
                      opposite_order->limit_price,
-                     Helpers::getCurrentNsTimestamp()}
+                     Common::getCurrentNsTimestamp()}
                 );
                 getPriceLevel(opposite_order->limit_price, side)->cancel(opposite_order->order_id);
             } else {
                 market_update_queue->push(
-                    {UpdateType::MODIFY,
+                    {CPPExchange::UpdateType::MODIFY,
                      ticker_id,
                      opposite_order->order_id,
                      TradeId_INVALID,
                      opposite_order->side,
                      opposite_order->quantity,
                      opposite_order->limit_price,
-                     Helpers::getCurrentNsTimestamp()}
+                     Common::getCurrentNsTimestamp()}
                 );
             }
 
             client_response_queue->push(
-                {ResponseType::FILLED,
+                {CPPExchange::ResponseType::FILLED,
                  ticker_id,
                  opposite_order->client_id,
                  opposite_order->order_id,
                  opposite_order->side,
                  fill_quantity,
                  opposite_order->limit_price,
-                 Helpers::getCurrentNsTimestamp()}
+                 Common::getCurrentNsTimestamp()}
             );
             client_response_queue->push(
-                {ResponseType::FILLED,
+                {CPPExchange::ResponseType::FILLED,
                  ticker_id,
                  client_id,
                  order_id,
                  side,
                  fill_quantity,
                  opposite_order->limit_price,
-                 Helpers::getCurrentNsTimestamp()}
+                 Common::getCurrentNsTimestamp()}
             );
 
             quantity -= fill_quantity;

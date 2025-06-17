@@ -2,10 +2,9 @@
 // Created by Petio Petrov on 2024-07-22.
 //
 
-#include "cppexchange/orderbook.h"
-
 #include <doctest/doctest.h>
 
+#include "cppexchange/orderbook.h"
 #include "cppexchange/constants.h"
 #include "cppexchange/messages.h"
 #include "cppexchange/order.h"
