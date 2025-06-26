@@ -2,6 +2,9 @@
 
 ## ToDo's
 
+- [ ] Refactor the order book to use a bounded price range, and maintain a circular buffer / sliding window
+      to allow in-place price range movements.
+  - See [below investigation](#2025-06-26-update).
 - [ ] Check where is the order priority attribute used.
   - I suspect it's to return the information to the user.
 - [ ] Currently, the price levels iterate over the orders linked-list to find the order to cancel.
@@ -80,6 +83,13 @@ operation on the price and instead indexing by the price proper. This approach i
 $O(1)$ amortized.
 
 This approach is still hackable via overflowing the object pool, but I will simulate "good-actor" traders only.
+
+#### 2025-06-26 Update
+
+Upon reflection, and investigation of the `BTCUSDT` Binance order book, I can see that Binance limits order prices
+to a current range of 21,426-535,882. At 2 decimal places price increments, this means
+`(535,882 - 21,426) * 100 = 51,445,600` price levels. An array-based hash map pointing to the respective price level's
+orders linked-list will have to be around `51,445,600 * 8 = 411,564,800 bytes`, which is entirely doable.
 
 ## Dependencies
 
