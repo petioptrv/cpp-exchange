@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...3.22)
+cmake_minimum_required(VERSION 3.14...4.2)
 
 # ---- Project ----
 project(
@@ -8,9 +8,11 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic")
 set(CMAKE_VERBOSE_MAKEFILE ON)
+
+include(CTest)
+enable_testing()
 
 # ---- In-source build guard ----
 if (PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
@@ -38,13 +40,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # ---- Create library ----
 add_library(${PROJECT_NAME} STATIC ${headers} ${sources})
+find_package(libevent CONFIG REQUIRED)
 
-# ---- Link libevent (Intel macOS) ----
-set(LIBEVENT_INCLUDE_DIRS "/usr/local/include")
-set(LIBEVENT_LIBRARIES "/usr/local/lib/libevent.dylib")
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${LIBEVENT_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBEVENT_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        libevent::core
+        libevent::extra
+        libevent::pthreads
+)
 
 # ---- Option to build standalone ----
 option(BUILD_STANDALONE "Build the standalone executable" OFF)
@@ -54,6 +57,9 @@ if (BUILD_STANDALONE)
 
     add_executable(socket_example ${CMAKE_SOURCE_DIR}/standalone/socket_example.cpp)
     target_link_libraries(socket_example ${PROJECT_NAME})
+
+    add_executable(benchmark_exchange ${CMAKE_SOURCE_DIR}/standalone/benchmark_exchange_mt.cpp)
+    target_link_libraries(benchmark_exchange ${PROJECT_NAME})
 
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.env
             ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)

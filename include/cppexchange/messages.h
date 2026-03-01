@@ -17,7 +17,8 @@ namespace CPPExchange {
         CANCEL = 2
     };
 
-    struct ClientRequest { // todo: add request ID to match response to request
+    struct ClientRequest {
+        // todo: add request ID to match response to request
         RequestType type = RequestType::INVALID;
         TickerIdT ticker_id = TickerId_INVALID;
         ClientIdT client_id = ClientId_INVALID;
@@ -27,12 +28,18 @@ namespace CPPExchange {
         PriceT limit_price = Price_INVALID;
     };
 
+    struct MDPClientRequest {
+        size_t sequence_number = 0;
+        ClientRequest client_request;
+    };
+
     enum class ResponseType : uint8_t {
         INVALID = 0,
         ACCEPTED = 1,
         FILLED = 2,
         CANCELED = 3,
-        CANCEL_REJECTED = 4
+        CANCEL_REJECTED = 4,
+        ERROR = 5
     };
 
     struct ClientResponse {
@@ -43,7 +50,12 @@ namespace CPPExchange {
         Orders::OrderSide side = Orders::OrderSide::INVALID;
         QuantityT quantity = Quantity_INVALID;
         PriceT price = Price_INVALID;
-        Common::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+        Utils::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+    };
+
+    struct MDPClientResponse {
+        size_t sequence_number = 0;
+        ClientResponse *client_response;
     };
 
     enum class UpdateType : uint8_t { INVALID = 0, ADD = 1, MODIFY = 2, REMOVE = 3, TRADE = 4 };
@@ -56,7 +68,12 @@ namespace CPPExchange {
         Orders::OrderSide side = Orders::OrderSide::INVALID;
         QuantityT quantity = Quantity_INVALID;
         PriceT price = Price_INVALID;
-        Common::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+        Utils::NsTimestampT ns_timestamp = NsTimestamp_INVALID;
+    };
+
+    struct MDPMarketUpdate {
+        size_t sequence_number = 0;
+        MarketUpdate market_update;
     };
 
 #pragma pack(pop)
@@ -64,4 +81,5 @@ namespace CPPExchange {
     typedef Communication::LFQueue<ClientRequest> ClientRequestLFQueue;
     typedef Communication::LFQueue<ClientResponse> ClientResponseLFQueue;
     typedef Communication::LFQueue<MarketUpdate> MarketUpdateLFQueue;
-}  // namespace CPPExchange
+    typedef Communication::LFQueue<MDPMarketUpdate> MDPMarketUpdateLFQueue;
+} // namespace CPPExchange

@@ -25,14 +25,19 @@ namespace Communication {
         ) : requests(requests), pending_requests() {
         }
 
-        auto addRequest(const CPPExchange::ClientRequest &request, const Utils::NsTimestampT timestamp) {
+        auto addRequest(const CPPExchange::ClientRequest *request, const Utils::NsTimestampT timestamp) {
             if (UNLIKELY(pending_requests_index == MAX_PENDING_REQUESTS)) {
                 FATAL("Too many pending requests.");
             }
 
-            pending_requests.at(pending_requests_index++) = std::move(
-                ReceiveTimeClientRequest{timestamp, request}
-            );
+            auto &[receive_timestamp, request_slot] = pending_requests.at(pending_requests_index++);
+            std::memcpy(&request_slot, request, sizeof(CPPExchange::ClientRequest));
+            receive_timestamp = timestamp;
+        }
+
+        auto addRequest(const CPPExchange::ClientRequest &request, const Utils::NsTimestampT timestamp) {
+            // facilitates unit tests.
+            addRequest(&request, timestamp);
         }
 
         auto sequenceAndPublish() {

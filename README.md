@@ -1,10 +1,20 @@
 # CPP Exchange
 
+## Benchmarking Results
+Performed on Apple M4 chip.
+```text
+Throughput: 2.34338e+06 orders/sec
+p50:  333 ns
+p99:  458 ns
+p999: 1416 ns
+```
+
 ## ToDo's
 
 - [ ] Refactor the order book to use a bounded price range, and maintain a circular buffer / sliding window
       to allow in-place price range movements.
   - See [below investigation](#2025-06-26-update).
+- [ ] Profile `messages.h` to ensure cacheline friendliness.
 - [ ] Check where is the order priority attribute used.
   - I suspect it's to return the information to the user.
 - [ ] Currently, the price levels iterate over the orders linked-list to find the order to cancel.
